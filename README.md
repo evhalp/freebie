@@ -7,9 +7,12 @@ Use pip install django and also make sure you have python install
 Team Name: FSG (Free Stuff Gang)
 
 Team Roles:
+- Sabal: Front-end
+- Evan: databases
+- Kai: Algorithms searching
+- Robert: Help Kai, Help Sabal
 
-
-Programming langauges/technologies:
+Programming languages/technologies:
 - Python
 - HTML
 - CSS
