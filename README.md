@@ -3,6 +3,7 @@ Crowdsourcing free stuff
 
 Use pip install django and also make sure you have python install
 
+Project proposal doc: https://docs.google.com/document/d/14wUHDETqFBAJxq2Xv32xHQ7AU1Nfeustxxs-AiFO2fE/edit?tab=t.0 
 
 Team Name: FSG (Free Stuff Gang)
 
