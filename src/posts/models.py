@@ -1,6 +1,18 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+class Tag(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+    slug = models.SlugField(max_length=50, unique=True)
+    description = models.TextField()
+    color = models.CharField(max_length=7, default='#000000')
+
+    class Meta:
+        ordering = ['name']
+
+    def __str__(self):
+        return f'{self.name} ({self.slug})'
+
 class Post(models.Model):
 
     user = models.ForeignKey(
@@ -13,6 +25,7 @@ class Post(models.Model):
     location = models.CharField(max_length=255, blank=True, null=True)
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
+    tags = models.ManyToManyField(Tag, related_name='posts', blank=True)
     image_path = models.CharField(max_length=500, blank=True, null=True)
     # Django could also handle image uploads with models.ImageField(upload_to='posts/', blank=True, null=True), if we prefer
     # We'd need to pip install pillow, first, though

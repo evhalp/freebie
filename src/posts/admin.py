@@ -1,5 +1,20 @@
 from django.contrib import admin
-from .models import Post
+from django.utils.html import format_html
+from .models import Tag, Post
+
+@admin.register(Tag)
+class TagAdmin(admin.ModelAdmin):
+    list_display = ['name', 'slug', 'color_preview', 'description']
+    prepopulated_fields = {'slug': ('name',)}
+    search_fields = ['name']
+
+    def color_preview(self, obj):
+        return format_html(
+            '<span style="background-color: {}; padding: 5px 15px; border-radius: 3px; color: white;">{}</span>',
+            obj.color,
+            obj.color
+        )
+    color_preview.short_description = 'Color'
 
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
