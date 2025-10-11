@@ -1,6 +1,15 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block title %}Freebie - Dashboard{% endblock title %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href={% static 'css/dashboard.css' %}>
+{% endblock extra_css%}
+
 {% block content %}
-    Hello, {{ user.username|default:"Guest" }}!
+    Hello, {{ user.username | default:"Guest" }}!
+    <br><br><br>
     <hr />
     {% if user.is_authenticated %}
         {% include "registration/_logout.html" %}

@@ -32,15 +32,15 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'users',
+    'search',
+
+    # built-in apps
     'django.contrib.auth',
     'django.contrib.admin',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
-    #new apps
-    'search',
 ]
 
 MIDDLEWARE = [
