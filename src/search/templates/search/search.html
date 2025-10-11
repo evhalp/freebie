@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Search Page</title>
+    <link rel="stylesheet" href="../../static/css/search.css">
+</head>
+<body>
+    <h1>Search</h1>
+    <form method="get" action="{% url 'results' %}">
+        <input type="text" name="q" placeholder="Type your search..." required>
+        <button type="submit">Search</button>
+    </form>
+</body>
+</html>
