@@ -33,6 +33,7 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'users',
     'search',
+    'posts',
 
     # built-in apps
     'django.contrib.auth',
