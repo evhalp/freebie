@@ -65,3 +65,19 @@ class Comment(models.Model):
 
     def __str__(self):
         return f'Comment by {self.user.username} on "{self.post.title}"'
+
+class PostReaction(models.Model):
+    REACTION_CHOICES = [
+        ('LIKE', 'Like'),
+        ('DISLIKE', 'Dislike'),
+        ('GOING', 'Going'),
+    ]
+
+    post = models.ForeignKey(
+        Post,
+        on_delete=models.CASCADE,
+        related_name='reactions'
+    )
+    user = models.ForeignKey(
+        User,
+    )

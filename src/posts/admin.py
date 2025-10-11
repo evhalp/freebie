@@ -27,7 +27,7 @@ class PostAdmin(admin.ModelAdmin):
     description_preview.short_description = 'Description'
 
 @admin.register(Comment)
-class PostComment(admin.ModelAdmin):
+class CommentAdmin(admin.ModelAdmin):
     list_display = ['post', 'user', 'content_preview', 'parent', 'created_at']
     list_filter = ['created_at']
     search_fields = ['content', 'user__username', 'post__title']
