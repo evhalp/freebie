@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from .models import Tag, Post, Comment
+from .models import Tag, Post, Comment, Reaction
 
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
@@ -36,3 +36,10 @@ class CommentAdmin(admin.ModelAdmin):
     def content_preview(self, obj):
         return f'{obj.content[:50]}...' if len(obj.content) > 50 else obj.content
     content_preview.short_description = 'Content'
+
+@admin.register(Reaction)
+class ReactionAdmin(admin.ModelAdmin):
+    list_display = ['user', 'post', 'sentiment', 'is_attending', 'created_at']
+    list_filter = ['sentiment', 'is_attending', 'created_at']
+    search_fields = ['user__username', 'post__title']
+    raw_id_fields = ['post', 'user']

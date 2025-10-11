@@ -38,6 +38,15 @@ class Post(models.Model):
     def __str__(self):
         return f'"{self.title}" by {self.user.username}'
     
+    def get_like_count(self):
+        return self.reactions.filter(sentiment='LIKE').count()
+    
+    def get_dislike_count(self):
+        return self.reactions.filter(sentiment='DISLIKE').count()
+
+    def get_attendance(self):
+        return self.reactions.filter(is_attending=True).count()
+
 class Comment(models.Model):
     post = models.ForeignKey(
         Post,
@@ -66,11 +75,10 @@ class Comment(models.Model):
     def __str__(self):
         return f'Comment by {self.user.username} on "{self.post.title}"'
 
-class PostReaction(models.Model):
-    REACTION_CHOICES = [
-        ('LIKE', 'Like'),
-        ('DISLIKE', 'Dislike'),
-        ('GOING', 'Going'),
+class Reaction(models.Model):
+    SENTIMENT_ENUM = [
+        ('LIKE', 'Liked'),
+        ('DISLIKE', 'Disliked')
     ]
 
     post = models.ForeignKey(
@@ -80,4 +88,29 @@ class PostReaction(models.Model):
     )
     user = models.ForeignKey(
         User,
+        on_delete=models.CASCADE,
+        related_name='reactions'
     )
+    sentiment = models.CharField(
+        max_length=10,
+        choices=SENTIMENT_ENUM,
+        blank=True,
+        null=True
+    )
+    is_attending = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ['post', 'user']
+        ordering = ['-created_at']
+
+    def __str__(self):
+        reactions = []
+        if self.sentiment:
+            reactions.append(self.sentiment)
+        if self.is_attending:
+            reactions.append("is attending")
+        reaction_str = " and ".join(reactions) if reactions else "No reactions"
+        return f'{self.user.username} {reaction_str} "{self.post.title}"'
+    
