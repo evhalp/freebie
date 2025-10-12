@@ -1,3 +1,24 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Freebie - Search{% endblock title %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href={% static 'css/search.css' %}>
+{% endblock extra_css%}
+
+{% block content %}
+    <body>
+        <h1>Search</h1>
+        <form method="get" action="{% url 'results' %}">
+            <input type="text" name="q" placeholder="Type your search..." required>
+            <button type="submit">Search</button>
+        </form>
+    </body>
+    </html>
+{% endblock content %}
+
+<!--
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,3 +34,4 @@
     </form>
 </body>
 </html>
+-->
