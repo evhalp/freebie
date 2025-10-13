@@ -21,8 +21,8 @@ Programming languages/technologies:
 - SGLite
 
 Django Commands:
-python manage.py runserver = Runs Website
-python manage.py createsuperuser = Creates Admin User
-python manage.py migrate = Creates SQLite database (run if facing database issues)
+- python manage.py runserver = Runs Website
+- python manage.py createsuperuser = Creates Admin User
+- python manage.py migrate = Creates SQLite database (run if facing database issues)
 
 
