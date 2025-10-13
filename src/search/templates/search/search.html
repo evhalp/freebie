@@ -9,11 +9,21 @@
 
 {% block content %}
     <!-- SEARCH CONTENT GOES HERE -->
-    <form class = "search-bar" method="get" action="{% url 'results' %}">
-        <input class = "search-bar" type="text" name="q" placeholder="Type your search..." required>
+     <div class = "search-bar-container">
+        <form class = "search-bar" method="get" action="{% url 'results' %}">
+            <input class = "search-bar" type="text" name="q" placeholder="Type your search..." required>
+            <button>All</button>
+        </form>
         <button type="submit">Search</button>
-        
-    </form>
+        <div class = "search-filter-buttons">
+            
+            Sort by: 
+            <button id = "popular">Popular</button>
+            <button id = "happening-now">Happening Now!</button>
+            <button id = "ends-soon">Ends Soon!</button>
+        </div>
+     </div>
+    
 
 
     <!--Chatgpted events -->
