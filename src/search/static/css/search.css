@@ -4,8 +4,7 @@
   justify-content: center;
   display: flex;
   justify-content: center;
-  margin: 2rem 0;
-  height: 20px;
+  margin: 20px 0;
 }
 
 .search-bar input {
@@ -16,6 +15,7 @@
   border-radius: var(--radius) 0 0 var(--radius);
   font-size: 1rem;
   outline: none;
+  height: 40px;
 }
 
 .search-bar button {
@@ -23,7 +23,7 @@
   color: #fff;
   border: none;
   height: inherit;
-  padding: 20px;
+  padding: 10px;
   font-size: 1rem;
   border-radius: 0 var(--radius) var(--radius) 0;
   cursor: pointer;
