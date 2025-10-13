@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Freebie - Search{% endblock title %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/search.css' %}">
+{% endblock extra_css%}
+
+{% block content %}
+    <!-- SEARCH CONTENT GOES HERE -->
+    <form class = "search-bar" method="get" action="{% url 'results' %}">
+        <input class = "search-bar" type="text" name="q" placeholder="Type your search..." required>
+        <button type="submit">Search</button>
+        
+    </form>
+{% endblock content %}
