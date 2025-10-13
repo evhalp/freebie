@@ -18,11 +18,11 @@ Programming languages/technologies:
 - HTML
 - CSS
 - Django
-- PostgreSQL
+- SGLite
 
-We still have to:
-Describe your solution to the challenge statement.
-Develop a project vision using the Geoffry Moore Template in Chapter 1 of the textbook. 
-Develop a risk management plan using the risk management process.
+Django Commands:
+python manage.py runserver = Runs Website
+python manage.py createsuperuser = Creates Admin User
+python manage.py migrate = Creates SQLite database (run if facing database issues)
 
 
