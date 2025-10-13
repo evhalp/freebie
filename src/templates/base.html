@@ -1,18 +1,47 @@
-{% load static %}
 
+
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>{% block title %}Freebie{% endblock title %}</title>
-    {% block extra_css %}{% endblock %}
+  <meta charset="UTF-8">
+  <title>{% block title %}Events{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/base.css' %}">
+  {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <h1>Freebie</h1>
-    <a href="{% url 'search' %}">Search</a>
-    <a href="{% url 'dashboard' %}">Dashboard</a>
-    <hr />
-    {% block content %}
-    {% endblock content %}
+
+  <nav class="navbar">
+    <div class="container">
+      <a href="{% url 'dashboard' %}" class="logo">Freebie!</a>
+      <ul>
+        <li class = "username">Hello, {{ user.username | default:"Guest" }}!</li>
+        <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+        <li><a href="{% url 'search' %}">Search</a></li>
+        <li>
+            {% if user.is_authenticated %}
+            {% include "registration/_logout.html" %}
+            <a href="{% url 'password_change' %}">Change password</a>
+            {% else %}
+                <a href="{% url 'login' %}">Login</a></li>
+
+                <li><a href="{% url 'sign_up' %}">Sign up</a>
+            {% endif %}
+        </li>
+
+      </ul>
+    </div>
+  </nav>
+
+
+  <div class = "container">
+    {% block content %}{% endblock %}
+  </div>
+   
+
+  <footer>
+    © {{ now|date:"Y" }} Freebie. All rights reserved.
+  </footer>
+
 </body>
 </html>
