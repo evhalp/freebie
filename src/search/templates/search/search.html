@@ -9,9 +9,23 @@
 
 {% block content %}
     <!-- SEARCH CONTENT GOES HERE -->
-    <form class = "search-bar" method="get" action="{% url 'results' %}">
+    <form class = "search-bar" method="GET" action="">
         <input class = "search-bar" type="text" name="q" placeholder="Type your search..." required>
         <button type="submit">Search</button>
-        
     </form>
+    {% if query %}
+        {% if results %}
+            <ul>
+                {% for item in results %}
+                    <li>
+                        {{ item.title }}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No results found for "{{ query }}"</p>
+        {% endif %}
+        
+    {% endif %}
+
 {% endblock content %}
