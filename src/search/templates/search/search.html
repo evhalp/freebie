@@ -9,23 +9,74 @@
 
 {% block content %}
     <!-- SEARCH CONTENT GOES HERE -->
-    <form class = "search-bar" method="GET" action="">
-        <input class = "search-bar" type="text" name="q" placeholder="Type your search..." required>
-        <button type="submit">Search</button>
-    </form>
-    {% if query %}
-        {% if results %}
-            <ul>
-                {% for item in results %}
-                    <li>
-                        {{ item.title }}
-                    </li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p>No results found for "{{ query }}"</p>
-        {% endif %}
+     <div class = "search-bar-container">
+        <form class = "search-bar" method="get" action="{% url 'results' %}">
+            <input class = "search-bar" type="text" name="q" placeholder="Type your search..." required>
+            <button>All</button>
+            <button type="submit">Search</button>
+        </form>
         
-    {% endif %}
+        <div class = "search-filter-buttons">
+            
+            Sort by: 
+            <button id = "popular">Popular</button>
+            <button id = "happening-now">Happening Now!</button>
+            <button id = "ends-soon">Ends Soon!</button>
+        </div>
+     </div>
+
+    <!--Chatgpted events -->
+      <!-- EVENT GRID -->
+  <div class="event-grid">
+
+    <!-- Event 1 -->
+    <div class="event-card">
+      <img src="{% static 'images/concert.jpg' %}" alt="Live Concert">
+      <div class="content">
+        <h3>Summer Beats Live Concert</h3>
+        <p>Join us for an unforgettable night of live performances featuring top artists and an amazing crowd atmosphere.</p>
+        <div class="meta">
+          August 24, 2025 — <span class="tag">Music</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Event 2 -->
+    <div class="event-card">
+      <img src="{% static 'images/hackathon.jpg' %}" alt="Hackathon">
+      <div class="content">
+        <h3>UF Hackathon 2025</h3>
+        <p>A 48-hour challenge where developers, designers, and engineers come together to build innovative tech projects.</p>
+        <div class="meta">
+          September 10–12, 2025 — <span class="tag">Tech</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Event 3 -->
+    <div class="event-card">
+      <img src="{% static 'images/marathon.jpg' %}" alt="Marathon">
+      <div class="content">
+        <h3>Gainesville Charity Marathon</h3>
+        <p>Run for a cause! Join our annual marathon to raise funds for local community organizations.</p>
+        <div class="meta">
+          October 3, 2025 — <span class="tag">Sports</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Event 4 -->
+    <div class="event-card">
+      <img src="{% static 'images/artfair.jpg' %}" alt="Art Fair">
+      <div class="content">
+        <h3>Downtown Art Fair</h3>
+        <p>Explore stunning art exhibits, meet local artists, and enjoy live music and street food.</p>
+        <div class="meta">
+          November 15, 2025 — <span class="tag">Art</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
 
 {% endblock content %}
