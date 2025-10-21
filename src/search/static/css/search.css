@@ -2,7 +2,7 @@
 .search-bar-container{
   flex-direction: row;
   align-items: center;
-  justify-content: space-between;
+  justify-content: space-evenly;
   display: flex;
   margin: 20px 0;
   width: 100%;
@@ -10,20 +10,19 @@
 .search-filter-buttons{
   flex-direction: row;
   align-items: center;
-  justify-content: space-around;
+  justify-content: space-between;
   display: flex;
   width: 35%;
 }
 .search-bar {
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   display: flex;
-  justify-content: center;
-  margin: 20px 0;
+  width: 100%;
 }
 
 .search-bar input {
-  width: 100%;
+  width: 35%;
   max-width: 500px;
   padding: 0.8rem 1rem;
   border: 1px solid var(--border-color);
