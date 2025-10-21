@@ -61,9 +61,11 @@
 
 /* ---- EVENT POSTS ---- */
 .event-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.5rem;
+  display: flex;
+  flex-direction: row;
+  /* grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); */
+  flex-wrap: wrap;
+  gap: 20px;
 }
 
 .event-card {
@@ -72,6 +74,7 @@
   border-radius: var(--radius);
   overflow: hidden;
   transition: transform var(--transition), box-shadow var(--transition);
+  width: 280px;
 }
 
 .event-card:hover {
