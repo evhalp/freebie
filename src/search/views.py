@@ -7,12 +7,12 @@ from posts.models import Post
 
 
 def search_view(request):
-    """Search posts with optional text + sort filters and 20 posts per page ."""
+
     q = (request.GET.get('q') or '').strip()                # text query ('' if empty search)
     sort = (request.GET.get('sort') or 'popular').lower()   # 'popular' by default | 'now' | 'new'
     page_raw = request.GET.get('page', '1')                 # page number as string. default is '1'
 
-    # --- Build the base queryset, how chatgpt recommends ---
+    # Build the base queryset. This is how chatgpt recommends
     qs = (
         Post.objects.all()                            # searches all posts
         .select_related('user')                       # pull user in same query for speed
@@ -26,13 +26,14 @@ def search_view(request):
         )
     )
 
-    # --- Apply search (title or description) ---
+    # Apply search (title or description)
     if q:
         qs = qs.filter(
             Q(title__icontains=q) | Q(description__icontains=q)
+            | Q(tags__name__icontains=q) | Q(tags__slug__icontains=q)
         ).distinct()                            # stops duplicates
 
-    # --- Filters/sorting ---
+    # Filters/sorting
     now = timezone.now()
 
     if sort == 'now':
@@ -46,7 +47,7 @@ def search_view(request):
         # Default 'popular'
         qs = qs.order_by('-like_count', '-created_at')      # sort by like count and break ties with time created
 
-    # --- 20 results per page ---
+    # 20 results per page
     paginator = Paginator(qs, 20)                     # Built in django page separation. 20 per page
     try:
         page_number = int(page_raw)                   # get page number
@@ -56,11 +57,11 @@ def search_view(request):
     try:
         page_obj = paginator.page(page_number)        # the current page object
     except PageNotAnInteger:
-        page_obj = paginator.page(1)                  # if not an integer,y fallback to page 1
+        page_obj = paginator.page(1)                  # if not an integer, fallback to page 1
     except EmptyPage:
         page_obj = paginator.page(paginator.num_pages)  # if out of page range, fallback to last page
 
-    # --- Render template with everything the UI needs ---
+    # Render template with everything the UI needs
     context = {
         'query': q,             # the search text the user typed in the box
         'sort': sort,           # how we’re sorting results (popular, now, or new)
