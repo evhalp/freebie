@@ -12,10 +12,22 @@
     <div class="search-bar-container">
         <form class="search-bar" method="get" action="">
             <!-- keep user’s search text -->
-            <input class="search-bar" type="text" name="q" placeholder="Type your search..." value="{{ query }}" required>
-
+            <div class = "search-bar-group">
+              <input class="search-bar" type="text" name="q" placeholder="Type your search..." value="{{ query }}" required>
+              <div class = "tag-buttons">
+                <button name = "filter" id = "all">All</button>
+                <div class ="hidden">
+                  <button name = "filter" id = "food">Food</button>
+                  <button name = "filter" id = "clothes">Clothes</button>
+                </div>
+                
+              </div>
+            </div>
+            
             <!-- main search button -->
             <button type="submit">Search</button>
+
+            
 
             <!-- sort filter buttons -->
             <div class="search-filter-buttons">

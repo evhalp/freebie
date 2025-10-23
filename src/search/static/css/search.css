@@ -59,6 +59,44 @@
   background-color: #1d4ed8;
 }
 
+.search-bar-group{
+  display: flex;
+  flex-direction: row;
+
+  width: 100%;
+}
+
+
+
+.tag-buttons{
+  align-items: center;
+  justify-content: center;
+  width: 75px;
+  position: relative; /* this makes it the positioning reference */
+  display: inline-block;
+}
+
+.tag-buttons button{
+  border-radius: 0;
+  border-style:solid;
+  border-color: #1b42ac;
+  border-width: 1px;
+  width: 100%;
+}
+
+/* Hide the secondary buttons */
+.hidden {
+  display: none;
+  position: absolute; 
+  top: 100%; 
+  left: 0;
+  z-index: 10;
+}
+.tag-buttons:hover .hidden{
+  display: block; /* or flex, depending on layout */
+  
+}
+
 /* ---- EVENT POSTS ---- */
 .event-grid {
   display: flex;
