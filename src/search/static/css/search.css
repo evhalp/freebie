@@ -22,7 +22,7 @@
 }
 
 .search-bar input {
-  width: 35%;
+  width: 50%;
   max-width: 500px;
   padding: 0.8rem 1rem;
   border: 1px solid var(--border-color);
@@ -62,8 +62,7 @@
 .search-bar-group{
   display: flex;
   flex-direction: row;
-
-  width: 100%;
+  width: 60%
 }
 
 
