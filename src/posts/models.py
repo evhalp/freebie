@@ -29,13 +29,13 @@ class Post(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        ordering = ['-created_at']
+
     def save(self, *args, **kwargs):
         if self.pk and not self.image:
             self.image = self.image.field.default
         super().save(*args, **kwargs)
-
-    class Meta:
-        ordering = ['-created_at']
 
     def __str__(self):
         return f'"{self.title}" by {self.user.username}'
