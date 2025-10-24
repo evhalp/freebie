@@ -23,7 +23,7 @@ class Migration(migrations.Migration):
                 ('location', models.CharField(blank=True, max_length=255, null=True)),
                 ('start_time', models.DateTimeField()),
                 ('end_time', models.DateTimeField()),
-                ('image_path', models.CharField(blank=True, max_length=500, null=True)),
+                ('image', models.ImageField(default='default.png', upload_to='post/images', blank=True)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now_add=True)),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='posts', to=settings.AUTH_USER_MODEL)),
