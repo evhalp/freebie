@@ -4,81 +4,170 @@
 {% block title %}Freebie - Search{% endblock title %}
 
 {% block extra_css %}
-    <link rel="stylesheet" href="{% static 'css/search.css' %}">
-{% endblock extra_css%}
+<link rel="stylesheet" href="{% static 'css/search.css' %}">
+{% endblock extra_css %}
+
 
 {% block content %}
-    <!-- SEARCH CONTENT GOES HERE -->
-     <div class = "search-bar-container">
-        <form class = "search-bar" method="get" action="{% url 'results' %}">
-            <input class = "search-bar" type="text" name="q" placeholder="Type your search..." required>
-            <button>All</button>
-            <button type="submit">Search</button>
-        </form>
-        
-        <div class = "search-filter-buttons">
-            
-            Sort by: 
-            <button id = "popular">Popular</button>
-            <button id = "happening-now">Happening Now!</button>
-            <button id = "ends-soon">Ends Soon!</button>
+<div class="search-bar-container">
+  <form class="search-bar" method="get" action="">
+    <div class="search-bar-group">
+      <input
+        class="search-bar"
+        type="text"
+        name="q"
+        placeholder="Type your search..."
+        value="{{ query }}"
+        required
+      />
+
+      <div class="tag-buttons">
+        <!-- Main tag button shows currently selected tag -->
+        <button type="button" id="main-tag" data-value="{{ tag|default:'all' }}">
+          {{ tag|capfirst|default:'All' }}
+        </button>
+
+        <div class="hidden" id="hidden-tags">
+          {% if tag != 'food' %}
+            <button type="button" class="sub-tag" data-value="food">Food</button>
+          {% endif %}
+          {% if tag != 'clothes' %}
+            <button type="button" class="sub-tag" data-value="clothes">Clothes</button>
+          {% endif %}
+          {% if tag != 'all' %}
+            <button type="button" class="sub-tag" data-value="all">All</button>
+          {% endif %}
         </div>
-     </div>
-    
 
-
-    <!--Chatgpted events -->
-      <!-- EVENT GRID -->
-  <div class="event-grid">
-
-    <!-- Event 1 -->
-    <div class="event-card">
-      <img src="{% static 'images/concert.jpg' %}" alt="Live Concert">
-      <div class="content">
-        <h3>Summer Beats Live Concert</h3>
-        <p>Join us for an unforgettable night of live performances featuring top artists and an amazing crowd atmosphere.</p>
-        <div class="meta">
-          August 24, 2025 — <span class="tag">Music</span>
-        </div>
+        <!-- Hidden input Django actually reads -->
+        <input type="hidden" name="tag" id="selected-tag" value="{{ tag|default:'all' }}">
       </div>
+
+      <button type="submit">Search</button>
     </div>
 
-    <!-- Event 2 -->
-    <div class="event-card">
-      <img src="{% static 'images/hackathon.jpg' %}" alt="Hackathon">
-      <div class="content">
-        <h3>UF Hackathon 2025</h3>
-        <p>A 48-hour challenge where developers, designers, and engineers come together to build innovative tech projects.</p>
-        <div class="meta">
-          September 10–12, 2025 — <span class="tag">Tech</span>
-        </div>
-      </div>
+    <!-- Sort buttons -->
+    <div class="search-filter-buttons">
+      Sort by:
+      <button
+        type="submit"
+        name="sort"
+        value="popular"
+        class="{% if sort == 'popular' %}active-sort{% endif %}"
+      >Popular</button>
+
+      <button
+        type="submit"
+        name="sort"
+        value="now"
+        class="{% if sort == 'now' %}active-sort{% endif %}"
+      >Happening Now!</button>
+
+      <button
+        type="submit"
+        name="sort"
+        value="new"
+        class="{% if sort == 'new' %}active-sort{% endif %}"
+      >Newest</button>
     </div>
+  </form>
+</div>
 
-    <!-- Event 3 -->
-    <div class="event-card">
-      <img src="{% static 'images/marathon.jpg' %}" alt="Marathon">
-      <div class="content">
-        <h3>Gainesville Charity Marathon</h3>
-        <p>Run for a cause! Join our annual marathon to raise funds for local community organizations.</p>
-        <div class="meta">
-          October 3, 2025 — <span class="tag">Sports</span>
+<!-- EVENT GRID -->
+<div class="event-grid">
+  {% if page_obj.object_list %}
+    {% for post in page_obj.object_list %}
+      <div class="event-card">
+        <div class="content">
+            <div class="image-wrapper">
+            <img class ='post-image' src="{{post.image.url}}" alt="{{post.title}}">
+            </div>
+            <h4 id="post-title">{{ post.title }}</h4>
+            {% if post.location %}
+                <p class="post-location">
+                    <i class="fa-solid fa-location-dot"></i>{{ post.location }}
+                </p>  
+            {% endif %}
+            <p id="post-description">
+                {% if post.description|length > 180 %}
+                {{ post.description|slice:":180" }}…
+                {% else %}
+                {{ post.description }}
+                {% endif %}
+            </p>
+            <div id="tags">
+                {% if post.tags.all %}
+                {% for t in post.tags.all %}
+                    <span class="tag">{{ t.name }}</span>{% if not forloop.last %}{% endif %}
+                {% endfor %}
+                {% endif %}
+            </div> 
+            <div class="footer">
+                <div id="post-date">
+                    {{ post.start_time|date:"F j, Y" }}
+                </div>
+                <div id="like-button">
+                    <div id="icon">
+                        <i class="fa-solid fa-thumbs-up"></i>
+                    </div>
+                    Likes: {{ post.like_count|default:0 }}
+                </div>
+            </div>
         </div>
-      </div>
     </div>
+    {% endfor %}
+  {% else %}
+    <p>No results found.</p>
+  {% endif %}
+</div>
 
-    <!-- Event 4 -->
-    <div class="event-card">
-      <img src="{% static 'images/artfair.jpg' %}" alt="Art Fair">
-      <div class="content">
-        <h3>Downtown Art Fair</h3>
-        <p>Explore stunning art exhibits, meet local artists, and enjoy live music and street food.</p>
-        <div class="meta">
-          November 15, 2025 — <span class="tag">Art</span>
-        </div>
-      </div>
-    </div>
+<!-- PAGINATION -->
+{% if paginator.num_pages > 1 %}
+<nav class="pagination">
+  <ul>
+    {% if page_obj.has_previous %}
+      <li><a href="?q={{ query }}&sort={{ sort }}&tag={{ tag }}&page={{ page_obj.previous_page_number }}">‹ Prev</a></li>
+    {% else %}
+      <li class="disabled"><span>‹ Prev</span></li>
+    {% endif %}
 
-  </div>
+    <li><span>Page {{ page_obj.number }} of {{ paginator.num_pages }}</span></li>
 
+    {% if page_obj.has_next %}
+      <li><a href="?q={{ query }}&sort={{ sort }}&tag={{ tag }}&page={{ page_obj.next_page_number }}">Next ›</a></li>
+    {% else %}
+      <li class="disabled"><span>Next ›</span></li>
+    {% endif %}
+  </ul>
+</nav>
+{% endif %}
 {% endblock content %}
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const mainBtn = document.getElementById("main-tag");
+  const subBtns = document.querySelectorAll(".sub-tag");
+  const hiddenInput = document.getElementById("selected-tag");
+  const form = mainBtn.closest("form");
+
+  subBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+      // Swap main and clicked button text/values
+      const oldValue = mainBtn.dataset.value;
+      const oldText = mainBtn.textContent;
+
+      mainBtn.dataset.value = btn.dataset.value;
+      mainBtn.textContent = btn.textContent;
+
+      btn.dataset.value = oldValue;
+      btn.textContent = oldText;
+
+      // Update hidden input and submit the form
+      hiddenInput.value = mainBtn.dataset.value;
+      form.submit();
+    });
+  });
+});
+</script>
+{% endblock extra_js %}
