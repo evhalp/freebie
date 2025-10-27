@@ -1,6 +1,5 @@
-<form method="post" action="{% url 'logout' %}">
+<form method="post" action="{% url 'logout' %}" class="logout-form">
     {% csrf_token %}
-    {{ form.as_p }}
     <input type="submit" value="Logout" />
     <input type="hidden" name="next" value="{% url 'dashboard' %}" />
 </form>

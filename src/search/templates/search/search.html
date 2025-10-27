@@ -20,6 +20,7 @@
         value="{{ query }}"
         required
       />
+      <button type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
 
       <div class="tag-buttons">
         <!-- Main tag button shows currently selected tag -->
@@ -43,17 +44,17 @@
         <input type="hidden" name="tag" id="selected-tag" value="{{ tag|default:'all' }}">
       </div>
 
-      <button type="submit">Search</button>
     </div>
 
     <!-- Sort buttons -->
     <div class="search-filter-buttons">
-      Sort by:
+      <p>Sort by:</p>
       <button
         type="submit"
         name="sort"
         value="popular"
         class="{% if sort == 'popular' %}active-sort{% endif %}"
+        id = "popular"
       >Popular</button>
 
       <button
@@ -61,17 +62,31 @@
         name="sort"
         value="now"
         class="{% if sort == 'now' %}active-sort{% endif %}"
-      >Happening Now!</button>
+        id = "happening"
+      >Happening Now</button>
 
       <button
         type="submit"
         name="sort"
         value="new"
         class="{% if sort == 'new' %}active-sort{% endif %}"
+        id = "new"
       >Newest</button>
     </div>
   </form>
 </div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const buttons = document.querySelectorAll(".search-filter-buttons button");
+    buttons.forEach(button => {
+      button.addEventListener("click", function (e) {
+        buttons.forEach(btn => btn.classList.remove("active-sort"));
+        this.classList.add("active-sort");
+      });
+    });
+  });
+</script>
 
 <!-- EVENT GRID -->
 <div class="event-grid">
