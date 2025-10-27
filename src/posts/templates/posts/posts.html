@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Freebie - Post{% endblock title %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/posts.css' %}">
+{% endblock extra_css %}
+
+
+{% block content %}
+<div class = "post-container">
+    <div class = "image-container">
+        <!-- replace image source with {{post.image.url}} -->
+        <img src = "https://images.pexels.com/photos/976866/pexels-photo-976866.jpeg?cs=srgb&dl=pexels-joshsorenson-976866.jpg&fm=jpg" alt = "post-image"/>
+    </div>
+    <div class = "post-info">
+        <div class = "user-container">
+            <div class = "profile">
+                <div class = "profile-image-container">
+                    <img class = "image" src = "https://hips.hearstapps.com/hmg-prod/images/dog-puppy-on-garden-royalty-free-image-1586966191.jpg?crop=0.752xw:1.00xh;0.175xw,0&resize=1200:*" alt = "profile-image"/>
+                </div>
+                <div class = "username">
+                    USERNAME
+                </div>
+            </div>
+            <div class="follow-button-container">
+                <button>Follow</button>
+            </div>
+        </div>
+        <div class = "description-container">
+            DESCRIPTION: Lorem ipsum dolor sit amet, consectetur adipisicing elit. Officia harum, quisquam quo alias vero iste. Voluptate ut enim cum facere quisquam ullam aperiam a alias distinctio! Vel repellendus adipisci vero. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptatem, aliquam! Dolorem, omnis labore ullam architecto quod nesciunt obcaecati, assumenda at praesentium expedita officiis. At accusamus repudiandae nam laboriosam. Quis, doloribus! Lorem ipsum dolor sit amet consectetur adipisicing elit. Ullam amet neque nihil dolore, consequatur magni doloremque dicta dolor reprehenderit praesentium dolorem ratione a impedit. Placeat quidem corrupti fugit quasi maxime.
+        </div>
+        <div class = "interactions">
+            <button class = "like-button">👍</button>
+            <button class = "comment-button">Comment</button>
+            <button class = "attending-button">I'm going!</button>
+        </div>
+        <div class = "other-info">
+            Post Info
+        </div>
+    </div>
+    
+</div>
+
+{% endblock content %}
+
+{% block extra_js %}
+{% endblock extra_js %}
