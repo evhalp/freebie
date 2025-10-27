@@ -10,9 +10,10 @@
 .search-filter-buttons{
   flex-direction: row;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
+  gap: 0.7rem;
+  flex-wrap: wrap;
   display: flex;
-  width: 35%;
 }
 .search-bar {
   align-items: center;
@@ -43,8 +44,9 @@
   cursor: pointer;
   transition: background-color var(--transition);
 }
+
 .search-filter-buttons button{
-  background-color: var(--secondary-color);
+  background-color: black;
   color: #fff;
   border: none;
   height: inherit;
@@ -53,10 +55,22 @@
   border-radius: 5px;
   cursor: pointer;
   transition: background-color var(--transition);
+  width: auto;
 }
 
 .search-bar button:hover {
   background-color: #1d4ed8;
+}
+
+.search-filter-buttons button.active-sort {
+  background-color: #1d4ed8;
+  color: white;
+  border: 1px solid #007bff;
+  font-weight: bold;
+}
+
+.search-filter-buttons p {
+  font-weight: bold;
 }
 
 .search-bar-group{
@@ -111,6 +125,7 @@
   overflow: hidden;
   transition: transform var(--transition), box-shadow var(--transition);
   width: 280px;
+  height: 420px;
 }
 
 .event-card:hover {
@@ -120,6 +135,9 @@
 
 .event-card .content {
   padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  height: 100%
 }
 
 .event-card h3 {
@@ -186,6 +204,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-top: auto;
   padding-top: 10px;
 }
 
@@ -218,4 +237,14 @@
 #like-button i:hover{
   color: var(--primary-color);
   transform: scale(1.1);
+}
+
+.pagination ul {
+  list-style: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  padding-top: 25px;
+  font-size: 1.1rem;
 }
