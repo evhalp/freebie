@@ -107,7 +107,7 @@ h1, h2, h3 {
 }
 
 .navbar li a:hover {
-  opacity: 0.7;
+    opacity: 0.7;
 }
 
 /* ---- CATEGORY TAGS ---- */

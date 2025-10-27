@@ -10,44 +10,9 @@
 
 {% block content %}
 <div class="search-bar-container">
-  <form class="search-bar" method="get" action="">
-    <div class="search-bar-group">
-      <input
-        class="search-bar"
-        type="text"
-        name="q"
-        placeholder="Type your search..."
-        value="{{ query }}"
-        required
-      />
-      <button type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
-
-      <div class="tag-buttons">
-        <!-- Main tag button shows currently selected tag -->
-        <button type="button" id="main-tag" data-value="{{ tag|default:'all' }}">
-          {{ tag|capfirst|default:'All' }}
-        </button>
-
-        <div class="hidden" id="hidden-tags">
-          {% if tag != 'food' %}
-            <button type="button" class="sub-tag" data-value="food">Food</button>
-          {% endif %}
-          {% if tag != 'clothes' %}
-            <button type="button" class="sub-tag" data-value="clothes">Clothes</button>
-          {% endif %}
-          {% if tag != 'all' %}
-            <button type="button" class="sub-tag" data-value="all">All</button>
-          {% endif %}
-        </div>
-
-        <!-- Hidden input Django actually reads -->
-        <input type="hidden" name="tag" id="selected-tag" value="{{ tag|default:'all' }}">
-      </div>
-
-    </div>
-
     <!-- Sort buttons -->
-    <div class="search-filter-buttons">
+  <form class="search-bar-form" method="get" action="">
+    <div class="search-filters">
       <p>Sort by:</p>
       <button
         type="submit"
@@ -73,12 +38,47 @@
         id = "new"
       >Newest</button>
     </div>
+    <div class="search-bar-and-tags">
+    <div class="search-bar-center">
+      <input
+        class="search"
+        type="text"
+        name="q"
+        placeholder="Type your search..."
+        value="{{ query }}"
+        required
+      />
+      <button type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
+    </div>
+
+    <div class="tag-buttons">
+      <!-- Main tag button shows currently selected tag -->
+      <button type="button" id="main-tag" data-value="{{ tag|default:'all' }}">
+        {{ tag|capfirst|default:'All' }}
+      </button>
+
+      <div class="hidden" id="hidden-tags">
+        {% if tag != 'food' %}
+          <button type="button" class="sub-tag" data-value="food">Food</button>
+        {% endif %}
+        {% if tag != 'clothes' %}
+          <button type="button" class="sub-tag" data-value="clothes">Clothes</button>
+        {% endif %}
+        {% if tag != 'all' %}
+          <button type="button" class="sub-tag" data-value="all">All</button>
+        {% endif %}
+      </div>
+      </div>
+        <!-- Hidden input Django actually reads -->
+      <input type="hidden" name="tag" id="selected-tag" value="{{ tag|default:'all' }}">
+      </div>
+    </div>
   </form>
 </div>
 
 <script>
   document.addEventListener("DOMContentLoaded", function () {
-    const buttons = document.querySelectorAll(".search-filter-buttons button");
+    const buttons = document.querySelectorAll(".search-filters button");
     buttons.forEach(button => {
       button.addEventListener("click", function (e) {
         buttons.forEach(btn => btn.classList.remove("active-sort"));
