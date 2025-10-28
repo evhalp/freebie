@@ -52,26 +52,35 @@
     </div>
 
     <div class="tag-buttons">
-      <!-- Main tag button shows currently selected tag -->
-      <button type="button" id="main-tag" data-value="{{ tag|default:'all' }}">
-        {{ tag|capfirst|default:'All' }}
-      </button>
+        <!-- Main tag button shows currently selected tag -->
+        <button type="button" id="main-tag" data-value="{{ tag|default:'all' }}">
+          {% if tag == 'all' %}
+            All
+          {% else %}
+            {% for t in tags %}
+              {% if t.slug == tag %}
+                {{ t.name|capfirst }}
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+        </button>
 
-      <div class="hidden" id="hidden-tags">
-        {% if tag != 'food' %}
-          <button type="button" class="sub-tag" data-value="food">Food</button>
-        {% endif %}
-        {% if tag != 'clothes' %}
-          <button type="button" class="sub-tag" data-value="clothes">Clothes</button>
-        {% endif %}
-        {% if tag != 'all' %}
-          <button type="button" class="sub-tag" data-value="all">All</button>
-        {% endif %}
-      </div>
-      </div>
+        <div class="hidden" id="hidden-tags">
+          <!-- Shows "All" as an option if it isn't currently selected -->
+          {% if tag != 'all' %}
+            <button type="button" class="sub-tag" data-value="all">All</button>
+          {% endif %}
+
+          <!-- Shows all tags in Tag model except selected tag -->
+          {% for t in tags %}
+            {% if t.slug != tag %}
+              <button type="button" class="sub-tag" data-value="{{ t.slug }}">{{ t.name|capfirst }}</button>
+            {% endif %}
+          {% endfor %}
+        </div>
         <!-- Hidden input Django actually reads -->
       <input type="hidden" name="tag" id="selected-tag" value="{{ tag|default:'all' }}">
-      </div>
+    </div>
     </div>
   </form>
 </div>
