@@ -10,50 +10,16 @@
 
 {% block content %}
 <div class="search-bar-container">
-  <form class="search-bar" method="get" action="">
-    <div class="search-bar-group">
-      <input
-        class="search-bar"
-        type="text"
-        name="q"
-        placeholder="Type your search..."
-        value="{{ query }}"
-        required
-      />
-
-      <div class="tag-buttons">
-        <!-- Main tag button shows currently selected tag -->
-        <button type="button" id="main-tag" data-value="{{ tag|default:'all' }}">
-          {{ tag|capfirst|default:'All' }}
-        </button>
-
-        <div class="hidden" id="hidden-tags">
-          {% if tag != 'food' %}
-            <button type="button" class="sub-tag" data-value="food">Food</button>
-          {% endif %}
-          {% if tag != 'clothes' %}
-            <button type="button" class="sub-tag" data-value="clothes">Clothes</button>
-          {% endif %}
-          {% if tag != 'all' %}
-            <button type="button" class="sub-tag" data-value="all">All</button>
-          {% endif %}
-        </div>
-
-        <!-- Hidden input Django actually reads -->
-        <input type="hidden" name="tag" id="selected-tag" value="{{ tag|default:'all' }}">
-      </div>
-
-      <button type="submit">Search</button>
-    </div>
-
     <!-- Sort buttons -->
-    <div class="search-filter-buttons">
-      Sort by:
+  <form class="search-bar-form" method="get" action="">
+    <div class="search-filters">
+      <p>Sort by:</p>
       <button
         type="submit"
         name="sort"
         value="popular"
         class="{% if sort == 'popular' %}active-sort{% endif %}"
+        id = "popular"
       >Popular</button>
 
       <button
@@ -61,17 +27,66 @@
         name="sort"
         value="now"
         class="{% if sort == 'now' %}active-sort{% endif %}"
-      >Happening Now!</button>
+        id = "happening"
+      >Happening Now</button>
 
       <button
         type="submit"
         name="sort"
         value="new"
         class="{% if sort == 'new' %}active-sort{% endif %}"
+        id = "new"
       >Newest</button>
+    </div>
+    <div class="search-bar-and-tags">
+    <div class="search-bar-center">
+      <input
+        class="search"
+        type="text"
+        name="q"
+        placeholder="Type your search..."
+        value="{{ query }}"
+        required
+      />
+      <button type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
+    </div>
+
+    <div class="tag-buttons">
+      <!-- Main tag button shows currently selected tag -->
+      <button type="button" id="main-tag" data-value="{{ tag|default:'all' }}">
+        {{ tag|capfirst|default:'All' }}
+      </button>
+
+      <div class="hidden" id="hidden-tags">
+        {% if tag != 'food' %}
+          <button type="button" class="sub-tag" data-value="food">Food</button>
+        {% endif %}
+        {% if tag != 'clothes' %}
+          <button type="button" class="sub-tag" data-value="clothes">Clothes</button>
+        {% endif %}
+        {% if tag != 'all' %}
+          <button type="button" class="sub-tag" data-value="all">All</button>
+        {% endif %}
+      </div>
+      </div>
+        <!-- Hidden input Django actually reads -->
+      <input type="hidden" name="tag" id="selected-tag" value="{{ tag|default:'all' }}">
+      </div>
     </div>
   </form>
 </div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const buttons = document.querySelectorAll(".search-filters button");
+    buttons.forEach(button => {
+      button.addEventListener("click", function (e) {
+        buttons.forEach(btn => btn.classList.remove("active-sort"));
+        this.classList.add("active-sort");
+      });
+    });
+  });
+</script>
 
 <!-- EVENT GRID -->
 <div class="event-grid">
