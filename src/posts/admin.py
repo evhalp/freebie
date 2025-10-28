@@ -10,9 +10,10 @@ class TagAdmin(admin.ModelAdmin):
 
     def color_preview(self, obj):
         return format_html(
-            '<span style="background-color: {}; padding: 5px 15px; border-radius: 3px; color: white;">{}</span>',
-            obj.color,
-            obj.color
+            '<span style="background-color: {}; color: {}; padding: 5px 15px; border-radius: 3px;">{}</span>',
+            obj.bg_color,
+            obj.text_color,
+            obj.name
         )
     color_preview.short_description = 'Color'
 

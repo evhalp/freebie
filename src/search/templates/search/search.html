@@ -121,9 +121,9 @@
             </p>
             <div id="tags">
                 {% if post.tags.all %}
-                {% for t in post.tags.all %}
-                    <span class="tag">{{ t.name }}</span>{% if not forloop.last %}{% endif %}
-                {% endfor %}
+                  {% for t in post.tags.all %}
+                      <span class="tag" style="background-color: {{ t.bg_color }}; color: {{ t.text_color }}">{{ t.name }}</span>
+                  {% endfor %}
                 {% endif %}
             </div> 
             <div class="footer">
