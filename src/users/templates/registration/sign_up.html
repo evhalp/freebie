@@ -1,4 +1,14 @@
-]>Sign Up</h2>
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Freebie - Search{% endblock title %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/password-form.css' %}">
+{% endblock extra_css %}
+
+{% block content %}
+<h2>Sign Up</h2>
     <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
