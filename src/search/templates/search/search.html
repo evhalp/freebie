@@ -7,52 +7,19 @@
 <link rel="stylesheet" href="{% static 'css/search.css' %}">
 {% endblock extra_css %}
 
+
 {% block content %}
 <div class="search-bar-container">
-  <form class="search-bar" method="get" action="">
-    <div class="search-bar-group">
-      <input
-        class="search-bar"
-        type="text"
-        name="q"
-        placeholder="Type your search..."
-        value="{{ query }}"
-        required
-      />
-
-      <div class="tag-buttons">
-        <!-- Main tag button shows currently selected tag -->
-        <button type="button" id="main-tag" data-value="{{ tag|default:'all' }}">
-          {{ tag|capfirst|default:'All' }}
-        </button>
-
-        <div class="hidden" id="hidden-tags">
-          {% if tag != 'food' %}
-            <button type="button" class="sub-tag" data-value="food">Food</button>
-          {% endif %}
-          {% if tag != 'clothes' %}
-            <button type="button" class="sub-tag" data-value="clothes">Clothes</button>
-          {% endif %}
-          {% if tag != 'all' %}
-            <button type="button" class="sub-tag" data-value="all">All</button>
-          {% endif %}
-        </div>
-
-        <!-- Hidden input Django actually reads -->
-        <input type="hidden" name="tag" id="selected-tag" value="{{ tag|default:'all' }}">
-      </div>
-
-      <button type="submit">Search</button>
-    </div>
-
     <!-- Sort buttons -->
-    <div class="search-filter-buttons">
-      Sort by:
+  <form class="search-bar-form" method="get" action="">
+    <div class="search-filters">
+      <p>Sort by:</p>
       <button
         type="submit"
         name="sort"
         value="popular"
         class="{% if sort == 'popular' %}active-sort{% endif %}"
+        id = "popular"
       >Popular</button>
 
       <button
@@ -60,52 +27,109 @@
         name="sort"
         value="now"
         class="{% if sort == 'now' %}active-sort{% endif %}"
-      >Happening Now!</button>
+        id = "happening"
+      >Happening Now</button>
 
       <button
         type="submit"
         name="sort"
         value="new"
         class="{% if sort == 'new' %}active-sort{% endif %}"
+        id = "new"
       >Newest</button>
+    </div>
+    <div class="search-bar-and-tags">
+    <div class="search-bar-center">
+      <input
+        class="search"
+        type="text"
+        name="q"
+        placeholder="Type your search..."
+        value="{{ query }}"
+        required
+      />
+      <button type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
+    </div>
+
+    <div class="tag-buttons">
+      <!-- Main tag button shows currently selected tag -->
+      <button type="button" id="main-tag" data-value="{{ tag|default:'all' }}">
+        {{ tag|capfirst|default:'All' }}
+      </button>
+
+      <div class="hidden" id="hidden-tags">
+        {% if tag != 'food' %}
+          <button type="button" class="sub-tag" data-value="food">Food</button>
+        {% endif %}
+        {% if tag != 'clothes' %}
+          <button type="button" class="sub-tag" data-value="clothes">Clothes</button>
+        {% endif %}
+        {% if tag != 'all' %}
+          <button type="button" class="sub-tag" data-value="all">All</button>
+        {% endif %}
+      </div>
+      </div>
+        <!-- Hidden input Django actually reads -->
+      <input type="hidden" name="tag" id="selected-tag" value="{{ tag|default:'all' }}">
+      </div>
     </div>
   </form>
 </div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const buttons = document.querySelectorAll(".search-filters button");
+    buttons.forEach(button => {
+      button.addEventListener("click", function (e) {
+        buttons.forEach(btn => btn.classList.remove("active-sort"));
+        this.classList.add("active-sort");
+      });
+    });
+  });
+</script>
 
 <!-- EVENT GRID -->
 <div class="event-grid">
   {% if page_obj.object_list %}
     {% for post in page_obj.object_list %}
       <div class="event-card">
-        {% if post.image_path %}
-          <img src="{{ post.image_path }}" alt="{{ post.title }}">
-        {% else %}
-          <img src="{% static 'images/placeholder.jpg' %}" alt="{{ post.title }}">
-        {% endif %}
         <div class="content">
-          <h3>{{ post.title }}</h3>
-          <p>
-            {% if post.description|length > 180 %}
-              {{ post.description|slice:":180" }}…
-            {% else %}
-              {{ post.description }}
+            <div class="image-wrapper">
+            <img class ='post-image' src="{{post.image.url}}" alt="{{post.title}}">
+            </div>
+            <h4 id="post-title">{{ post.title }}</h4>
+            {% if post.location %}
+                <p class="post-location">
+                    <i class="fa-solid fa-location-dot"></i>{{ post.location }}
+                </p>  
             {% endif %}
-          </p>
-          <div class="meta">
-            {{ post.start_time|date:"F j, Y" }}
-            {% if post.location %} — <span class="tag">{{ post.location }}</span>{% endif %}
-          </div>
-          <div class="meta">
-            Likes: {{ post.like_count|default:0 }}
-            {% if post.tags.all %}
-              — 
-              {% for t in post.tags.all %}
-                <span class="tag">{{ t.name }}</span>{% if not forloop.last %},{% endif %}
-              {% endfor %}
-            {% endif %}
-          </div>
+            <p id="post-description">
+                {% if post.description|length > 180 %}
+                {{ post.description|slice:":180" }}…
+                {% else %}
+                {{ post.description }}
+                {% endif %}
+            </p>
+            <div id="tags">
+                {% if post.tags.all %}
+                {% for t in post.tags.all %}
+                    <span class="tag">{{ t.name }}</span>{% if not forloop.last %}{% endif %}
+                {% endfor %}
+                {% endif %}
+            </div> 
+            <div class="footer">
+                <div id="post-date">
+                    {{ post.start_time|date:"F j, Y" }}
+                </div>
+                <div id="like-button">
+                    <div id="icon">
+                        <i class="fa-solid fa-thumbs-up"></i>
+                    </div>
+                    Likes: {{ post.like_count|default:0 }}
+                </div>
+            </div>
         </div>
-      </div>
+    </div>
     {% endfor %}
   {% else %}
     <p>No results found.</p>
