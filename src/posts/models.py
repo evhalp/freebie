@@ -14,7 +14,6 @@ class Tag(models.Model):
         return f'{self.name} ({self.slug})'
 
 class Post(models.Model):
-
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -27,27 +26,19 @@ class Post(models.Model):
     end_time = models.DateTimeField()
     tags = models.ManyToManyField(Tag, related_name='posts', blank=True)
     image = models.ImageField(default='default.png', upload_to='post/images', blank=True)
-    # Django could also handle image uploads with models.ImageField(upload_to='posts/', blank=True, null=True), if we prefer
-    # We'd need to pip install pillow, first, though
-    # ^^^ We'll most likely have to go this route. Images are currently accessed on local machines which browsers can't do and
-    # so we'd need post images to be stored somewhere.
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ['-created_at']
 
+    def save(self, *args, **kwargs):
+        if self.pk and not self.image:
+            self.image = self.image.field.default
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return f'"{self.title}" by {self.user.username}'
-    
-    def get_like_count(self):
-        return self.reactions.filter(sentiment='LIKE').count()
-    
-    def get_dislike_count(self):
-        return self.reactions.filter(sentiment='DISLIKE').count()
-
-    def get_attendance(self):
-        return self.reactions.filter(is_attending=True).count()
 
 class Comment(models.Model):
     post = models.ForeignKey(

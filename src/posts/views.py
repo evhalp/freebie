@@ -28,7 +28,7 @@ def post_view(request):
     # --- Apply text search ---
     if q:
         qs = qs.filter(
-            Q(title__icontains=q) | Q(description__icontains=q)
+            Q(title__icontains=q) | Q(description__icontains=q) | Q(location__icontains=q)
         ).distinct()
 
     # --- Filter by tag ---
@@ -61,7 +61,7 @@ def post_view(request):
     context = {
         'query': q,
         'sort': sort,
-        'tag': tag,               # ✅ pass tag to template
+        'tag': tag,
         'page_obj': page_obj,
         'paginator': paginator,
         'now': now,
