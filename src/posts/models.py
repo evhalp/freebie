@@ -39,15 +39,6 @@ class Post(models.Model):
 
     def __str__(self):
         return f'"{self.title}" by {self.user.username}'
-    
-    def get_like_count(self):
-        return self.reactions.filter(sentiment='LIKE').count()
-    
-    def get_dislike_count(self):
-        return self.reactions.filter(sentiment='DISLIKE').count()
-
-    def get_attendance(self):
-        return self.reactions.filter(is_attending=True).count()
 
 class Comment(models.Model):
     post = models.ForeignKey(
