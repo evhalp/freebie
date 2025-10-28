@@ -34,7 +34,7 @@ def search_view(request):
 
     # --- Tags ---
     if tag != 'all':
-        qs = qs.filter(tags__name__iexact=tag)
+        qs = qs.filter(tags__slug__iexact=tag)
 
     tags = Tag.objects.all().order_by('name')
 
