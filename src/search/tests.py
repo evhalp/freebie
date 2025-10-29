@@ -174,7 +174,7 @@ class SearchViewTest(TestCase):
         self.assertEqual(posts[2], self.post_2)
         self.assertEqual(posts[3], self.post_1)
 
-    def test_sort_by_popular(self):
+    def test_sort_by_now(self):
         response = self.client.get(self.url, {'sort': 'now'})
         posts = response.context['page_obj'].object_list
         self.assertEqual(len(posts), 1)
