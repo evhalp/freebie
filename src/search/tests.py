@@ -2,7 +2,6 @@ from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth.models import User
 from django.utils import timezone
-from django.db import IntegrityError
 from datetime import timedelta
 from posts.models import Post, Tag, Reaction, Comment
 
@@ -76,21 +75,10 @@ class SearchViewTest(TestCase):
                 password='password1'
             )
             Reaction.objects.create(
-                post=self.post_1,
+                post=self.post_2,
                 user=user,
                 sentiment='LIKE',
                 is_attending=True
-            )
-        for i in range(2):
-            user = User.objects.create_user(
-                username=f'disliker_2_{i}',
-                password='password1'
-            )
-            Reaction.objects.create(
-                post=self.post_1,
-                user=user,
-                sentiment='DISLIKE',
-                is_attending=False
             )
 
         # Post 3 = Past Event
@@ -103,17 +91,6 @@ class SearchViewTest(TestCase):
             end_time=now - timedelta(days=2)
         )
         self.post_3.tags.add(self.tag_1, self.tag_2)
-        for i in range(2):
-            user = User.objects.create_user(
-                username=f'disliker_3_{i}',
-                password='password1'
-            )
-            Reaction.objects.create(
-                post=self.post_1,
-                user=user,
-                sentiment='DISLIKE',
-                is_attending=True
-            )
 
         # Post 4 = New Event
         self.post_4 = Post.objects.create(
@@ -125,25 +102,80 @@ class SearchViewTest(TestCase):
             end_time=now - timedelta(days=3, hours=2)
         )
         self.post_4.tags.add(self.tag_1, self.tag_2)
-        for i in range(3):
-            user = User.objects.create_user(
-                username=f'liker_2_{i}',
+        user = User.objects.create_user(
+                username=f'liker_4',
                 password='password1'
             )
-            Reaction.objects.create(
-                post=self.post_1,
-                user=user,
-                sentiment='LIKE',
-                is_attending=False
-            )
-        for i in range(2):
-            user = User.objects.create_user(
-                username=f'disliker_2_{i}',
-                password='password1'
-            )
-            Reaction.objects.create(
-                post=self.post_1,
-                user=user,
-                sentiment='DISLIKE',
-                is_attending=True
-            )
+        Reaction.objects.create(
+            post=self.post_4,
+            user=user,
+            sentiment='LIKE',
+            is_attending=True
+        )
+
+    def test_search_view_loads(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'search/search.html')
+
+    def test_search_view_context(self):
+        response = self.client.get(self.url)
+        self.assertIn('query', response.context)
+        self.assertIn('sort', response.context)
+        self.assertIn('tag', response.context)
+        self.assertIn('page_obj', response.context)
+        self.assertIn('paginator', response.context)
+        self.assertIn('now', response.context)
+        self.assertIn('tags', response.context)
+
+    def test_search_by_title(self):
+        response = self.client.get(self.url, {'q': 'rent Test Pos'})
+        posts = response.context['page_obj'].object_list
+        self.assertEqual(len(posts), 1)
+        self.assertEqual(posts[0], self.post_1)
+
+    def test_search_by_description(self):
+        response = self.client.get(self.url, {'q': 'ure Test Desc'})
+        posts = response.context['page_obj'].object_list
+        self.assertEqual(len(posts), 1)
+        self.assertEqual(posts[0], self.post_2)
+
+    def test_search_no_results(self):
+        response = self.client.get(self.url, {'q': 'Nonexistent'})
+        posts = response.context['page_obj'].object_list
+        self.assertEqual(len(posts), 0)
+
+    def test_search_empty_query(self):
+        response = self.client.get(self.url, {'q': ''})
+        posts = response.context['page_obj'].object_list
+        self.assertEqual(len(posts), 4)
+
+    def test_filter_by_tag(self):
+        response = self.client.get(self.url, {'tag': 'test_tag_1'})
+        posts = response.context['page_obj'].object_list
+        self.assertEqual(len(posts), 3)
+        self.assertIn(self.post_1, posts)
+        self.assertIn(self.post_3, posts)
+        self.assertIn(self.post_4, posts)
+
+    def test_sort_by_popular(self):
+        response = self.client.get(self.url, {'sort': 'popular'})
+        posts = response.context['page_obj'].object_list
+        self.assertEqual(posts[0], self.post_1)
+        self.assertEqual(posts[1], self.post_2)
+        self.assertEqual(posts[2], self.post_4)
+        self.assertEqual(posts[3], self.post_3)
+
+    def test_sort_by_new(self):
+        response = self.client.get(self.url, {'sort': 'new'})
+        posts = response.context['page_obj'].object_list
+        self.assertEqual(posts[0], self.post_4)
+        self.assertEqual(posts[1], self.post_3)
+        self.assertEqual(posts[2], self.post_2)
+        self.assertEqual(posts[3], self.post_1)
+
+    def test_sort_by_popular(self):
+        response = self.client.get(self.url, {'sort': 'now'})
+        posts = response.context['page_obj'].object_list
+        self.assertEqual(len(posts), 1)
+        self.assertEqual(posts[0], self.post_1)
