@@ -101,7 +101,7 @@
 <div class="event-grid">
   {% if page_obj.object_list %}
     {% for post in page_obj.object_list %}
-      <div class="event-card">
+      <div class="event-card" id = {{ post.id }}>
         <div class="content">
             <div class="image-wrapper">
             <img class ='post-image' src="{{post.image.url}}" alt="{{post.title}}">
@@ -169,6 +169,8 @@
 
 {% block extra_js %}
 <script>
+
+//Triggers after loading frontend
 document.addEventListener("DOMContentLoaded", () => {
   const mainBtn = document.getElementById("main-tag");
   const subBtns = document.querySelectorAll(".sub-tag");
@@ -192,6 +194,10 @@ document.addEventListener("DOMContentLoaded", () => {
       form.submit();
     });
   });
+  const events = document.querySelectorAll(".event-card");
+  events.forEach(e => {e.addEventListener("click", () => {
+    window.location.assign("posts=" + e.id);
+  })})
 });
 </script>
 {% endblock extra_js %}
