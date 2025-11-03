@@ -104,7 +104,11 @@
       <div class="event-card" id = {{ post.id }}>
         <div class="content">
             <div class="image-wrapper">
-            <img class ='post-image' src="{{post.image.url}}" alt="{{post.title}}">
+            {% if post.images.first %}
+              <img class='post-image' src="{{ post.images.first.image.url }}" alt="{{ post.images.first.caption|default:post.title }}">
+            {% else %}
+              <img class='post-image' src="{{ MEDIA_URL }}default.png" alt="{{ post.title }}">
+            {% endif %}
             </div>
             <h4 id="post-title">{{ post.title }}</h4>
             {% if post.location %}
