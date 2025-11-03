@@ -6,6 +6,7 @@ class PostImageInline(admin.TabularInline):
     model = PostImage
     extra = 1
     fields = ['image', 'order', 'caption']
+    readonly_fields = ['order']
     ordering = ['order']
 
 @admin.register(Tag)
@@ -34,13 +35,6 @@ class PostAdmin(admin.ModelAdmin):
     def description_preview(self, obj):
         return f'{obj.description[:50]}...' if len(obj.description) > 50 else obj.description
     description_preview.short_description = 'Description'
-
-@admin.register(PostImage)
-class PostImageAdmin(admin.ModelAdmin):
-    list_display = ['post', 'order', 'caption', 'created_at']
-    list_filter = ['created_at']
-    search_fields = ['post__title', 'caption']
-    ordering = ['post', 'order']
 
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):
