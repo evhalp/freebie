@@ -196,7 +196,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   const events = document.querySelectorAll(".event-card");
   events.forEach(e => {e.addEventListener("click", () => {
-    window.location.assign("posts=" + e.id);
+    window.location.assign("/posts/" + e.id);
   })})
 });
 </script>

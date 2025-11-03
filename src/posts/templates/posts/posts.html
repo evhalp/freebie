@@ -18,10 +18,10 @@
         <div class = "user-container">
             <div class = "profile">
                 <div class = "profile-image-container">
-                    <img class = "image" src = "https://hips.hearstapps.com/hmg-prod/images/dog-puppy-on-garden-royalty-free-image-1586966191.jpg?crop=0.752xw:1.00xh;0.175xw,0&resize=1200:*" alt = "profile-image"/>
+                    <img class = "image" src = {{post.imageURL}}/>
                 </div>
                 <div class = "username">
-                    USERNAME
+                    {{user.username}}
                 </div>
             </div>
             <div class="follow-button-container">
@@ -29,7 +29,7 @@
             </div>
         </div>
         <div class = "description-container">
-            DESCRIPTION: Lorem ipsum dolor sit amet, consectetur adipisicing elit. Officia harum, quisquam quo alias vero iste. Voluptate ut enim cum facere quisquam ullam aperiam a alias distinctio! Vel repellendus adipisci vero. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptatem, aliquam! Dolorem, omnis labore ullam architecto quod nesciunt obcaecati, assumenda at praesentium expedita officiis. At accusamus repudiandae nam laboriosam. Quis, doloribus! Lorem ipsum dolor sit amet consectetur adipisicing elit. Ullam amet neque nihil dolore, consequatur magni doloremque dicta dolor reprehenderit praesentium dolorem ratione a impedit. Placeat quidem corrupti fugit quasi maxime.
+            {{post.description}}
         </div>
         <div class = "interactions">
             <button class = "like-button">👍</button>
@@ -37,7 +37,8 @@
             <button class = "attending-button">I'm going!</button>
         </div>
         <div class = "other-info">
-            Post Info
+            {{post.location}}
+            {{post.start_time}}
         </div>
     </div>
     
