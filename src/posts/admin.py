@@ -29,6 +29,7 @@ class PostAdmin(admin.ModelAdmin):
     list_filter = ['created_at', 'start_time']
     search_fields = ['title', 'description', 'location', 'user__username']
     filter_horizontal = ['tags']
+    inlines = [PostImageInline]
 
     def description_preview(self, obj):
         return f'{obj.description[:50]}...' if len(obj.description) > 50 else obj.description
