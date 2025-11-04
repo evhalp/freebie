@@ -20,4 +20,9 @@ class Migration(migrations.Migration):
             name='text_color',
             field=models.CharField(default='#000000', max_length=7),
         ),
+        migrations.AlterField(
+            model_name='tag',
+            name='text_color',
+            field=models.CharField(default='#FFFFFF', max_length=7),
+        ),
     ]
