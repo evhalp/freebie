@@ -7,7 +7,10 @@
   <meta charset="UTF-8">
   <title>{% block title %}Events{% endblock %}</title>
   <link rel="stylesheet" href="{% static 'css/base.css' %}">
+  <link rel="stylesheet" href="{% static 'css/password-form.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   {% block extra_css %}{% endblock %}
+  {%block extra_js%}{% endblock %}
 </head>
 <body>
 
@@ -20,11 +23,12 @@
         <li><a href="{% url 'search' %}">Search</a></li>
         <li>
             {% if user.is_authenticated %}
-            {% include "registration/_logout.html" %}
-            <a href="{% url 'password_change' %}">Change password</a>
+            <div class ="authentication-links">
+              <a href="{% url 'password_change' %}">Change password</a>
+              {% include "registration/_logout.html" %}
+            </div>
             {% else %}
                 <a href="{% url 'login' %}">Login</a></li>
-
                 <li><a href="{% url 'sign_up' %}">Sign up</a>
             {% endif %}
         </li>

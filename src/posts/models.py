@@ -5,7 +5,9 @@ class Tag(models.Model):
     name = models.CharField(max_length=50, unique=True)
     slug = models.SlugField(max_length=50, unique=True)
     description = models.TextField()
-    color = models.CharField(max_length=7, default='#000000')
+    bg_color = models.CharField(max_length=7, default='#000000')
+    text_color = models.CharField(max_length=7, default='#FFFFFF')
+
 
     class Meta:
         ordering = ['name']
@@ -14,7 +16,6 @@ class Tag(models.Model):
         return f'{self.name} ({self.slug})'
 
 class Post(models.Model):
-
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -26,9 +27,6 @@ class Post(models.Model):
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
     tags = models.ManyToManyField(Tag, related_name='posts', blank=True)
-    image_path = models.CharField(max_length=500, blank=True, null=True)
-    # Django could also handle image uploads with models.ImageField(upload_to='posts/', blank=True, null=True), if we prefer
-    # We'd need to pip install pillow, first, though
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -37,15 +35,24 @@ class Post(models.Model):
 
     def __str__(self):
         return f'"{self.title}" by {self.user.username}'
-    
-    def get_like_count(self):
-        return self.reactions.filter(sentiment='LIKE').count()
-    
-    def get_dislike_count(self):
-        return self.reactions.filter(sentiment='DISLIKE').count()
 
-    def get_attendance(self):
-        return self.reactions.filter(is_attending=True).count()
+class PostImage(models.Model):
+    post = models.ForeignKey(
+        Post,
+        on_delete=models.CASCADE,
+        related_name='images'
+    )
+    image = models.ImageField(upload_to='post/images')
+    order = models.PositiveIntegerField(default=0)
+    caption = models.CharField(max_length=255, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['order', 'created_at']
+        unique_together = ['post', 'order']
+
+    def __str__(self):
+        return f'Image {self.order + 1} for {self.post.title} ({self.caption})'
 
 class Comment(models.Model):
     post = models.ForeignKey(
