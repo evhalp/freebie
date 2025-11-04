@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Freebie - Post{% endblock title %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/posts.css' %}">
+{% endblock extra_css %}
+
+
+{% block content %}
+<div class = "post-container">
+    <div class = "image-container">
+        <!-- replace image source with {{post.image.url}} -->
+        <img src = "https://images.pexels.com/photos/976866/pexels-photo-976866.jpeg?cs=srgb&dl=pexels-joshsorenson-976866.jpg&fm=jpg" alt = "post-image"/>
+    </div>
+    <div class = "post-info">
+        <div class = "user-container">
+            <div class = "profile">
+                <div class = "profile-image-container">
+                    <img class = "image" src = {{post.imageURL}}/>
+                </div>
+                <div class = "username">
+                    {{user.username}}
+                </div>
+            </div>
+            <div class="follow-button-container">
+                <button>Follow</button>
+            </div>
+        </div>
+        <div class = "description-container">
+            {{post.description}}
+        </div>
+        <div class = "interactions">
+            <button class = "like-button">👍</button>
+            <button class = "comment-button">Comment</button>
+            <button class = "attending-button">I'm going!</button>
+        </div>
+        <div class = "other-info">
+            {{post.location}}
+            {{post.start_time}}
+        </div>
+    </div>
+    
+</div>
+
+{% endblock content %}
+
+{% block extra_js %}
+{% endblock extra_js %}
