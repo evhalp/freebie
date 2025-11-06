@@ -1,9 +1,11 @@
 from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import Post, User
 from .forms import PostCreationForm, PostImageFormSet
-from users.models import  UserProfile
+from users.models import UserProfile
 
+@login_required
 def create_post_view(request):
     if request.method == 'POST':
         form = PostCreationForm(request.POST, request.FILES)
