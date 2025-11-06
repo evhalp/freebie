@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.db.models import Q, Count
 from django.utils import timezone
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from posts.models import Post
+from posts.models import Post, Tag
 
 def search_view(request):
     """Search posts with text, tag, and sort filters (20 per page)."""
@@ -33,9 +33,11 @@ def search_view(request):
             | Q(tags__name__icontains=q) | Q(tags__slug__icontains=q)
         ).distinct()                            # stops duplicates
 
-    # --- Filter by tag ---
+    # --- Tags ---
     if tag != 'all':
-        qs = qs.filter(tags__name__iexact=tag)
+        qs = qs.filter(tags__slug__iexact=tag)
+
+    tags = Tag.objects.all().order_by('name')
 
     # --- Sorting ---
     now = timezone.now()
@@ -65,10 +67,11 @@ def search_view(request):
     context = {
         'query': q,
         'sort': sort,
-        'tag': tag,               # ✅ pass tag to template
+        'tag': tag,
         'page_obj': page_obj,
         'paginator': paginator,
         'now': now,
+        'tags': tags
     }
 
     return render(request, 'search/search.html', context)

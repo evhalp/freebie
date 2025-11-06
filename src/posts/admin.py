@@ -1,6 +1,12 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from .models import Tag, Post, Comment, Reaction
+from .models import Tag, Post, PostImage, Comment, Reaction
+
+class PostImageInline(admin.TabularInline):
+    model = PostImage
+    extra = 1
+    fields = ['image', 'order', 'caption']
+    ordering = ['order']
 
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
@@ -10,9 +16,10 @@ class TagAdmin(admin.ModelAdmin):
 
     def color_preview(self, obj):
         return format_html(
-            '<span style="background-color: {}; padding: 5px 15px; border-radius: 3px; color: white;">{}</span>',
-            obj.color,
-            obj.color
+            '<span style="background-color: {}; color: {}; padding: 5px 15px; border-radius: 3px;">{}</span>',
+            obj.bg_color,
+            obj.text_color,
+            obj.name
         )
     color_preview.short_description = 'Color'
 
@@ -21,6 +28,8 @@ class PostAdmin(admin.ModelAdmin):
     list_display = ['title', 'user', 'description_preview', 'location', 'start_time', 'created_at']
     list_filter = ['created_at', 'start_time']
     search_fields = ['title', 'description', 'location', 'user__username']
+    filter_horizontal = ['tags']
+    inlines = [PostImageInline]
 
     def description_preview(self, obj):
         return f'{obj.description[:50]}...' if len(obj.description) > 50 else obj.description

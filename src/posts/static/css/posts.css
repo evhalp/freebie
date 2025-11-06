@@ -56,3 +56,11 @@
     scrollbar-width: none;
     scroll-behavior: smooth;
 }
+.interactions{
+    display: flex;
+    flex-direction: row;
+}
+.interactions p{
+    color: rgb(154, 154, 154);
+    font-size: 10pt;
+}
