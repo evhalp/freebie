@@ -18,6 +18,7 @@
         type="submit"
         name="sort"
         value="popular"
+        formnovalidate
         class="{% if sort == 'popular' %}active-sort{% endif %}"
         id = "popular"
       >Popular</button>
@@ -26,6 +27,7 @@
         type="submit"
         name="sort"
         value="now"
+        formnovalidate
         class="{% if sort == 'now' %}active-sort{% endif %}"
         id = "happening"
       >Happening Now</button>
@@ -34,6 +36,7 @@
         type="submit"
         name="sort"
         value="new"
+        formnovalidate
         class="{% if sort == 'new' %}active-sort{% endif %}"
         id = "new"
       >Newest</button>
