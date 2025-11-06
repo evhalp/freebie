@@ -34,9 +34,22 @@
             {{post.description}}
         </div>
         <div class = "interactions">
-            <button class = "like-button">👍</button> <p>Like count goes here</p>
+            <div id="like-button">
+                <div id="icon">
+                    <i class="fa-solid fa-thumbs-up"></i>
+                </div>
+                {{ post.like_count|default:0 }}
+            </div>
+            <!-- <p>Like count goes here</p> -->
+            <div class = "attending-container">
+                <button class = "attending-button">I'm going!</button> 
+                {{ post.like_count|default:0 }}
+            </div>
+            
+            <!-- <p>attending count goes here</p> -->
+        </div>
+        <div class = "comment-container">
             <button class = "comment-button">Comment</button>
-            <button class = "attending-button">I'm going!</button> <p>attending count goes here</p>
         </div>
         <div class = "other-info">
             {{post.location}}
