@@ -22,6 +22,10 @@
         <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
         <li><a href="{% url 'search' %}">Search</a></li>
         <li>
+          {% if user.is_authenticated %}
+            <a href="{% url 'create_post' %}">Create post</a>
+          {% endif %}
+        <li>
             {% if user.is_authenticated %}
             <div class ="authentication-links">
               <a href="{% url 'password_change' %}">Change password</a>
