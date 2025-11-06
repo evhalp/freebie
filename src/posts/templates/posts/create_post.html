@@ -21,7 +21,7 @@
             </div>
         {% endif %}
 
-        <form method="post" action="{% url 'create_post' %}">
+        <form method="post" action="{% url 'create_post' %}" enctype="multipart/form-data">
             {% csrf_token %}
             
             <div>
@@ -71,13 +71,22 @@
                     {{ form.end_time.errors }}
                 {% endif %}
             </div>
+            
+            <h2>Images</h2>
+            {{ formset.management_form }}
+            {% for image_form in formset %}
+                <div>
+                    <h3>Image {{ forloop.counter }}</h3>
+                    {{ image_form.as_p }}
+                </div>
+            {% endfor %}
 
             {% if form.non_field_errors %}
                 <div>
                     {{ form.non_field_errors }}
                 </div>
             {% endif %}
-
+            
             <div>
                 <button type="submit">Create Post</button>
                 <a href="{% url 'dashboard' %}">Cancel</a>

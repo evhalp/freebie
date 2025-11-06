@@ -1,5 +1,5 @@
 from django import forms
-from .models import Post, Tag
+from .models import Post, PostImage
 
 class PostCreationForm(forms.ModelForm):
 
@@ -51,3 +51,26 @@ class PostCreationForm(forms.ModelForm):
                 )
         
         return cleaned_data
+    
+class PostImageForm(forms.ModelForm):
+    
+    class Meta:
+        model = PostImage
+        fields = ['image', 'caption']
+        widgets = {
+            'image': forms.FileInput(attrs={
+                'class': 'form-control'
+            }),
+            'caption': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Optional caption'
+            })
+        }
+
+PostImageFormSet = forms.inlineformset_factory(
+    Post,
+    PostImage,
+    form=PostImageForm,
+    extra=3,
+    can_delete=False
+)
