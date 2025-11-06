@@ -8,10 +8,18 @@
 }
 .image-container{
     width: 80%;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    scroll-behavior: auto;
+    overflow: scroll;
+    gap: 50px;
 }
 .image-container img{
-    width: 100%;
-    height: auto;
+    height: 400px;
+    width: auto;
+
 }
 .post-info{
     padding-left: 5px;
