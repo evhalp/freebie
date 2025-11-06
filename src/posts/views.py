@@ -15,8 +15,10 @@ def create_post_view(request):
             post.save()
             form.save_m2m()
 
-            formset.instance = post
-            formset.save()
+            images = formset.save(commit=False)
+            for image in images:
+                image.post = post
+                image.save()
 
             return redirect('posts', id=post.id)
         else:
