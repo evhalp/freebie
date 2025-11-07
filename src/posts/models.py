@@ -49,10 +49,16 @@ class PostImage(models.Model):
 
     class Meta:
         ordering = ['order', 'created_at']
-        unique_together = ['post', 'order']
+        unique_together = ['order', 'post']
 
     def __str__(self):
-        return f'Image {self.order + 1} for {self.post.title} ({self.caption})'
+        return f'Image {self.order + 1} for {self.post.title}'
+    
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            max_order = PostImage.objects.filter(post=self.post).aggregate(models.Max('order'))['order__max']
+            self.order = (max_order + 1) if max_order is not None else 0
+        super().save(*args, **kwargs)
 
 class Comment(models.Model):
     post = models.ForeignKey(
