@@ -7,6 +7,7 @@ class UserProfileAdmin(admin.ModelAdmin):
     list_display = ['user__username', 'bio_preview', 'credibility', 'followers_count', 'following_count']
     search_fields = ['user__username']
     list_filter = ['credibility']
+    filter_horizontal = ['following']
 
     def bio_preview(self, obj):
         return f'{obj.bio[:50]}...' if len(obj.bio) > 50 else obj.bio
