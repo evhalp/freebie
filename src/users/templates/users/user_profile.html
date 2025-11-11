@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Freebie - Profile{% endblock title %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+{% endblock extra_css%}
+
+{% block content %}
+
+    <h1>{{ profile_user.username }}'s Profile</h1>
+    
+    {% if user == profile_user %}
+        <div>
+            <h2> Account Information </h2>
+            <p><strong>Username:</strong> {{ user.username }}</p>
+            <p><strong>First Name:</strong> {{ user.first_name }}</p>
+            <p><strong>Last Name:</strong> {{ user.last_name }}</p>
+            <p><strong>Email:</strong> {{ user.email }}</p>
+            <p><strong>Date Joined:</strong> {{ user.date_joined|date:"F d, Y" }}</p>
+            <p><strong>Last Login:</strong> {{ user.last_login|date:"F d, Y g:i A" }}</p>
+        </div>
+    {% endif %}
+
+    <div>
+        <h2> Profile Information </h2>
+        {% if profile_user.userprofile.image %}
+            <p><strong>Profile Image:</strong></p>
+            <img src="{{ profile_user.userprofile.image.url }}" alt="Profile Image" width="200">
+        {% endif %}
+        <p><strong>Bio:</strong> {{ profile_user.userprofile.bio|default:"No bio provided" }}</p>
+        <p><strong>Credibility:</strong> {{ profile_user.userprofile.credibility }}</p>
+        <p><strong>Followers:</strong> {{ profile_user.userprofile.followers.count }}</p>
+        <p><strong>Following:</strong> {{ profile_user.userprofile.following.count }}</p>
+        <p><strong>Profile Created:</strong> {{ profile_user.userprofile.created_at|date:"F d, Y" }}</p>
+        <p><strong>Last Updated:</strong> {{ profile_user.userprofile.updated_at|date:"F d, Y g:i A" }}</p>
+    </div>
+
+{% endblock content %}
