@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Create Post{% endblock title %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/posts.css' %}">
+{% endblock extra_css %}
+
+{% block content %}
+    <div>
+        <h1> Create New Post </h1>
+
+        {% if messages %}
+            <div>
+                {% for message in messages %}
+                    <div>
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <form method="post" action="{% url 'create_post' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <div>
+                <label for="{{ form.title.id_for_label }}">{{ form.title.label }}</label>
+                {{ form.title }}
+                {% if form.title.errors %}
+                    {{ form.title.errors }}
+                {% endif %}
+            </div>
+
+            <div>
+                <label for="{{ form.description.id_for_label }}">{{ form.description.label }}</label>
+                {{ form.description }}
+                {% if form.description.errors %}
+                    {{ form.description.errors }}
+                {% endif %}
+            </div>
+
+            <div>
+                <label for="{{ form.location.id_for_label }}">{{ form.location.label }}</label>
+                {{ form.location }}
+                {% if form.location.errors %}
+                    {{ form.location.errors }}
+                {% endif %}
+            </div>
+
+            <div>
+                <label for="{{ form.start_time.id_for_label }}">{{ form.start_time.label }}</label>
+                {{ form.start_time }}
+                {% if form.start_time.errors %}
+                    {{ form.start_time.errors }}
+                {% endif %}
+            </div>
+
+            <div>
+                <label for="{{ form.end_time.id_for_label }}">{{ form.end_time.label }}</label>
+                {{ form.end_time }}
+                {% if form.end_time.errors %}
+                    {{ form.end_time.errors }}
+                {% endif %}
+            </div>
+
+            <div>
+                <label>{{ form.tags.label }}</label>
+                {{ form.tags }}
+                {% if form.end_time.errors %}
+                    {{ form.end_time.errors }}
+                {% endif %}
+            </div>
+            
+            <h2>Images</h2>
+            {{ formset.management_form }}
+            {% for image_form in formset %}
+                <div>
+                    <h3>Image {{ forloop.counter }}</h3>
+                    {{ image_form.as_p }}
+                </div>
+            {% endfor %}
+
+            {% if form.non_field_errors %}
+                <div>
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+            
+            <div>
+                <button type="submit">Create Post</button>
+                <a href="{% url 'dashboard' %}">Cancel</a>
+            </div>
+        </form>
+    </div>
+{% endblock content %}
