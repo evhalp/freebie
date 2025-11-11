@@ -41,14 +41,14 @@ def post_view(request, id):
     """Loads Post information related to specified id"""
     # --- Base queryset ---
     post = Post.objects.get(id=id)
-    user = User.objects.get(username = post.user)
-    profile = UserProfile.objects.get(user = user)
+    post_user = User.objects.get(username = post.user)
+    profile = UserProfile.objects.get(user = request.user)
 
     # --- Context ---
     context = {
         'post': post,
-        'user': user,
-        "profile" : profile
+        'post_user': post_user,
+        'profile' : profile
     }
 
     return render(request, 'posts/posts.html', context)
