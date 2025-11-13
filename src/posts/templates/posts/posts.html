@@ -28,7 +28,7 @@
             </div>
             <form class="follow-button-container" action="{% url 'posts' id=post.id %}" method="POST">
                 {% csrf_token %}
-                {% if user.userprofile in post_user.userprofile.followers.all %}
+                {% if user.userprofile in profile.followers.all %}
                     <button type="submit" name="follow" value="unfollow">Unfollow</button>
                 {% else %}
                     <button type="submit" name="follow" value="follow">Follow</button>
