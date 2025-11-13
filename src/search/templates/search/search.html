@@ -129,7 +129,7 @@
             <div id="tags">
                 {% if post.tags.all %}
                   {% for t in post.tags.all %}
-                      <span class="tag" style="background-color: {{ t.bg_color }}; color: {{ t.text_color }}">{{ t.name }}</span>
+                      <span class="tag" title="{{ t.description }}" style="background-color: {{ t.bg_color }}; color: {{ t.text_color }}">{{ t.name }}</span>
                   {% endfor %}
                 {% endif %}
             </div> 
