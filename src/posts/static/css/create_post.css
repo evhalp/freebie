@@ -1,0 +1,61 @@
+label {
+    border-radius: 10px;
+    margin: 2rem auto;
+    max-width: 400px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--bg-color);
+    gap: 1rem;
+}
+
+.password-change-form label {
+    flex: 1;
+    text-align: left;
+    display: block;
+    margin-bottom: 0;
+}
+
+.password-change-form input[type="password"] {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+.password-change-form input[type="submit"] {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    cursor: pointer;
+    width: 35%;
+    height: 20px;
+    border-radius: 5px;
+    justify-content: center;
+    margin: auto;
+    transition: opacity var(--transition);
+}
+
+.password-change-form input[type="submit"]:hover {
+    opacity: 0.7;
+}
+
+.password-change-form input::placeholder {
+    font-style: italic;
+    font-size: 0.9rem;
+    opacity: 0.7;
+}
+
+a {
+    transition: opacity var(--transition);
+    font-weight: bold;
+}
+
+a:hover {
+    opacity: 0.7;
+}
+
+h2 {
+    font-weight: bold;
+}

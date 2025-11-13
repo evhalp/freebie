@@ -9,7 +9,14 @@ class PostCreationForm(forms.ModelForm):
         widgets = {
             'title': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'Enter post title'
+                'placeholder': 'Enter post title',
+                'style' : 'width: 100%;'
+                "padding: 0.5rem;"
+                'border: 1px solid;'
+                'border-radius: 5px;'
+                'font-size: 1rem;'
+                'width: 50%;'
+                
             }),
             'description': forms.Textarea(attrs={
                 'class': 'form-control',
@@ -71,6 +78,6 @@ PostImageFormSet = forms.inlineformset_factory(
     Post,
     PostImage,
     form=PostImageForm,
-    extra=3,
+    extra=1,
     can_delete=False
 )
