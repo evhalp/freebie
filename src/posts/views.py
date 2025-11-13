@@ -55,7 +55,7 @@ def post_view(request, id):
                 print(request.user.username, 'FOLLOWING', post_user.username)
                 request.user.userprofile.follow(profile)
 
-        #return redirect('posts', id=id)
+        return redirect('posts', id=id)
     # --- Context ---
     context = {
         'post': post,
