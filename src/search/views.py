@@ -12,7 +12,7 @@ def search_view(request):
     tag = (request.GET.get('tag') or 'all').lower()         # tag filter ('all' by default)
     page_raw = request.GET.get('page', '1')
 
-    # --- Base queryset ---
+    # Build the base queryset. This is how chatgpt recommends
     qs = (
         Post.objects.all()
         .select_related('user')
@@ -26,11 +26,12 @@ def search_view(request):
         )
     )
 
-    # --- Apply text search ---
+    # Apply search (title or description)
     if q:
         qs = qs.filter(
             Q(title__icontains=q) | Q(description__icontains=q)
-        ).distinct()
+            | Q(tags__name__icontains=q) | Q(tags__slug__icontains=q)
+        ).distinct()                            # stops duplicates
 
     # --- Tags ---
     if tag != 'all':
@@ -48,17 +49,19 @@ def search_view(request):
     else:
         qs = qs.order_by('-like_count', '-created_at')
 
-    # --- Pagination ---
-    paginator = Paginator(qs, 20)
+    # 20 results per page
+    paginator = Paginator(qs, 20)                     # Built in django page separation. 20 per page
     try:
         page_number = int(page_raw)
     except ValueError:
         page_number = 1
 
     try:
-        page_obj = paginator.page(page_number)
-    except (PageNotAnInteger, EmptyPage):
-        page_obj = paginator.page(1)
+        page_obj = paginator.page(page_number)        # the current page object
+    except PageNotAnInteger:
+        page_obj = paginator.page(1)                  # if not an integer, fallback to page 1
+    except EmptyPage:
+        page_obj = paginator.page(paginator.num_pages)  # if out of page range, fallback to last page
 
     # --- Context ---
     context = {
