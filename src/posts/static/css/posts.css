@@ -130,3 +130,30 @@ button:hover {
     color: rgb(154, 154, 154);
     gap: 5px;
 }
+
+
+
+/* Remove hover visual changes specifically for the like button */
+.like-toggle-button,
+.like-toggle-button i {
+    transition: none !important;
+}
+
+.like-toggle-button:hover,
+.like-toggle-button:hover i,
+#like-button i:hover {
+    color: inherit !important;
+    background-color: transparent !important;
+    transform: none !important;
+    cursor: default !important;
+}
+
+/* Liked appearance: filled primary color with white icon */
+.like-toggle-button.liked {
+    background-color: var(--primary-color, #1d4ed8) !important;
+    color: white !important;
+    border-color: var(--primary-color, #1d4ed8) !important;
+}
+.like-toggle-button.liked i {
+    color: inherit !important;
+}
