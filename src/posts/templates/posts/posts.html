@@ -26,9 +26,14 @@
                     {{post_user.username}}
                 </div>
             </div>
-            <div class="follow-button-container">
-                <button>Follow</button>
-            </div>
+            <form class="follow-button-container" action="{% url 'posts' id=post.id %}" method="POST">
+                {% csrf_token %}
+                {% if user.userprofile in post_user.userprofile.followers.all %}
+                    <button type="submit" name="follow" value="unfollow">Unfollow</button>
+                {% else %}
+                    <button type="submit" name="follow" value="follow">Follow</button>
+                {% endif %}
+            </form>
         </div>
         <div class = "description-container">
             {{post.description}}
