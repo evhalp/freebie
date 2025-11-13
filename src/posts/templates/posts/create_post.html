@@ -4,7 +4,7 @@
 {% block title %}Create Post{% endblock title %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/posts.css' %}">
+<link rel="stylesheet" href="{% static 'css/create_post.css' %}">
 {% endblock extra_css %}
 
 {% block content %}
@@ -21,48 +21,65 @@
             </div>
         {% endif %}
 
-        <form method="post" action="{% url 'create_post' %}" enctype="multipart/form-data">
+        <form class = "post-form-group" method="post" action="{% url 'create_post' %}" enctype="multipart/form-data">
             {% csrf_token %}
             
-            <div>
-                <label for="{{ form.title.id_for_label }}">{{ form.title.label }}</label>
-                {{ form.title }}
-                {% if form.title.errors %}
-                    {{ form.title.errors }}
-                {% endif %}
+            <div class = "description-fields">
+                <div class = "label-and-input">
+                    <div>
+                        <span style="color: red">*</span><label for="{{ form.title.id_for_label }}">{{ form.title.label }}</label>
+                    </div>
+                    {{ form.title }}
+                    {% if form.title.errors %}
+                        {{ form.title.errors }}
+                    {% endif %}
+                </div>
+                
+
+                <div class = "label-and-input">
+                    <div>
+                        <label for="{{ form.description.id_for_label }}">{{ form.description.label }}</label>
+                    </div>
+                    {{ form.description }}
+                    {% if form.description.errors %}
+                        {{ form.description.errors }}
+                    {% endif %}
+                </div>
+
+                <div class = "label-and-input">
+                    <div>
+                        <span style="color: red">* </span><label for="{{ form.location.id_for_label }}">{{ form.location.label }}</label>
+                    </div>
+                    {{ form.location }}
+                    {% if form.location.errors %}
+                        {{ form.location.errors }}
+                    {% endif %}
+                </div>
+                
             </div>
 
-            <div>
-                <label for="{{ form.description.id_for_label }}">{{ form.description.label }}</label>
-                {{ form.description }}
-                {% if form.description.errors %}
-                    {{ form.description.errors }}
-                {% endif %}
-            </div>
+            <div class = "time-fields">
+                <div>
+                    <div>
+                        <span style="color: red">* </span><label for="{{ form.start_time.id_for_label }}">{{ form.start_time.label }}</label>
+                    </div>
+                    {{ form.start_time }}
+                    {% if form.start_time.errors %}
+                        {{ form.start_time.errors }}
+                    {% endif %}
+                </div>
 
-            <div>
-                <label for="{{ form.location.id_for_label }}">{{ form.location.label }}</label>
-                {{ form.location }}
-                {% if form.location.errors %}
-                    {{ form.location.errors }}
-                {% endif %}
+                <div>
+                    <div>
+                        <span style="color: red">* </span><label for="{{ form.end_time.id_for_label }}">{{ form.end_time.label }}</label>
+                    </div>
+                    {{ form.end_time }}
+                    {% if form.end_time.errors %}
+                        {{ form.end_time.errors }}
+                    {% endif %}
+                </div>
             </div>
-
-            <div>
-                <label for="{{ form.start_time.id_for_label }}">{{ form.start_time.label }}</label>
-                {{ form.start_time }}
-                {% if form.start_time.errors %}
-                    {{ form.start_time.errors }}
-                {% endif %}
-            </div>
-
-            <div>
-                <label for="{{ form.end_time.id_for_label }}">{{ form.end_time.label }}</label>
-                {{ form.end_time }}
-                {% if form.end_time.errors %}
-                    {{ form.end_time.errors }}
-                {% endif %}
-            </div>
+            
 
             <div>
                 <label>{{ form.tags.label }}</label>

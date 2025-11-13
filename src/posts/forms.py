@@ -12,28 +12,59 @@ class PostCreationForm(forms.ModelForm):
                 'placeholder': 'Enter post title',
                 'style' : 'width: 100%;'
                 "padding: 0.5rem;"
-                'border: 1px solid;'
+                'border: 1px solid #ccc; '
                 'border-radius: 5px;'
                 'font-size: 1rem;'
-                'width: 50%;'
+                'width: 100%;'
                 
             }),
             'description': forms.Textarea(attrs={
                 'class': 'form-control',
                 'placeholder': 'Enter post description',
-                'rows': 5
+                'rows': 5,
+                'columns': 40,
+                'style': (
+                    'width: 100%; '
+                    'padding: 0.5rem; '
+                    'border: 1px solid #ccc; '
+                    'border-radius: 5px; '
+                    'font-size: 1rem; '
+                    'font-family: Arial, sans-serif; '
+                    'resize: none;'
+                ),
+                
             }),
             'location': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'Enter location'
+                'placeholder': 'Enter location',
+                'style' : 'width: 100%;'
+                "padding: 0.5rem;"
+                'border: 1px solid #ccc; '
+                'border-radius: 5px;'
+                'font-size: 1rem;'
+                'width: 100%;'
             }),
             'start_time': forms.DateTimeInput(attrs={
                 'class': 'form-control',
-                'type': 'datetime-local'
+                'type': 'datetime-local',
+                'style' : 'width: 100%;'
+                "padding: 0.5rem;"
+                'border: 1px solid #ccc; '
+                'border-radius: 5px;'
+                'font-family: Arial, sans-serif; '
+                'font-size: 1rem;'
+                'width: 100%;'
             }),
             'end_time': forms.DateTimeInput(attrs={
                 'class': 'form-control',
-                'type': 'datetime-local'
+                'type': 'datetime-local',
+                'style' : 'width: 100%;'
+                "padding: 0.5rem;"
+                'border: 1px solid #ccc; '
+                'border-radius: 5px;'
+                'font-family: Arial, sans-serif; '
+                'font-size: 1rem;'
+                'width: 100%;'
             }),
             'tags': forms.CheckboxSelectMultiple()
         }

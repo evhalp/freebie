@@ -1,3 +1,40 @@
+
+.post-form-group{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.description-fields{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 20px;
+    align-items: center;
+    width: 75%;
+}
+.label-and-input {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    /* max-width: 400px; */
+}
+.time-fields{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+    margin-top: 2rem;
+    width: 90%;
+}
+.label-and-input div{
+    display: flex;
+    width: 100%;
+    align-items: flex-start;
+}
+/* 
 label {
     border-radius: 10px;
     margin: 2rem auto;
@@ -7,7 +44,7 @@ label {
     flex-direction: column;
     background-color: var(--bg-color);
     gap: 1rem;
-}
+} */
 
 .password-change-form label {
     flex: 1;
