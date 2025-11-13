@@ -6,6 +6,7 @@ class PostImageInline(admin.TabularInline):
     model = PostImage
     extra = 1
     fields = ['image', 'order', 'caption']
+    readonly_fields = ['order']
     ordering = ['order']
 
 @admin.register(Tag)
@@ -28,6 +29,8 @@ class PostAdmin(admin.ModelAdmin):
     list_display = ['title', 'user', 'description_preview', 'location', 'start_time', 'created_at']
     list_filter = ['created_at', 'start_time']
     search_fields = ['title', 'description', 'location', 'user__username']
+    filter_horizontal = ['tags']
+    inlines = [PostImageInline]
     filter_horizontal = ['tags']
     inlines = [PostImageInline]
 
