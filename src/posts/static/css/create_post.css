@@ -27,12 +27,28 @@
     justify-content: space-evenly;
     align-items: center;
     margin-top: 2rem;
+    margin-bottom: 2rem;
     width: 90%;
 }
 .label-and-input div{
     display: flex;
     width: 100%;
     align-items: flex-start;
+}
+.tags-field{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    width: 75%;
+    margin-bottom: 2rem;
+}
+#id_tags{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+    width: 100%;
 }
 /* 
 label {
