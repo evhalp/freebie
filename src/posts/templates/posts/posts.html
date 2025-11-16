@@ -35,18 +35,18 @@
         </div>
         <div class = "interactions">
             <div id="like-button">
-                <div id="icon">
-                    <i class="fa-solid fa-thumbs-up"></i>
-                </div>
-                {{ post.like_count|default:0 }}
+                <form method="post" action="{% url 'post-like' post.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="like-toggle-button {% if user_liked %}liked{% endif %}">
+                        <i class="fa-solid fa-thumbs-up"></i>
+                    </button>
+                    <span class="like-count">{{ like_count|default:0 }}</span>
+                </form>
             </div>
-            <!-- <p>Like count goes here</p> -->
+            <!-- attending control (keeps previous layout; implement separately) -->
             <div class = "attending-container">
-                <button class = "attending-button">I'm going!</button> 
-                {{ post.like_count|default:0 }}
+                <button class = "attending-button">I'm going!</button>
             </div>
-            
-            <!-- <p>attending count goes here</p> -->
         </div>
         <div class = "comment-container">
             <button class = "comment-button">Comment</button>
