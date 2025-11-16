@@ -1,13 +1,27 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/password-form.css' %}">
+{% endblock extra_css %}
 
 {% block content %}
 
     <h2>Login</h2>
 
-    <form method="post">
+    <form method="post" class="password-change-form">
         {% csrf_token %}
 
-        {{ form.as_p }}
+        <div>
+            <label for="id_username"><span style="color: red">*</span>Username:</label>
+            {{ form.username }}
+        </div>
+
+        <div>
+            <label for="id_password"><span style="color: red">*</span>Password:</label>
+            {{ form.password }}
+        </div>
+
         <input type="submit" value="Login" />
         {% if next %}
             <input type="hidden" name="next" value="{{ next }}">
@@ -16,7 +30,16 @@
 
     <p>
         <a href="{% url 'password_reset' %}">Forgot your password?</a>
-        <a href="{% url 'dashboard' %}">Back to dashboard</a>
     </p>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+    const username = document.getElementById("id_username");
+    const password = document.getElementById("id_password");
+
+    if (username) username.placeholder = "Enter your username";
+    if (password) password.placeholder = "Enter your password";
+});
+</script>
 
 {% endblock content %}
