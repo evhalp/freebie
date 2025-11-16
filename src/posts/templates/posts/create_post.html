@@ -95,6 +95,7 @@
                 {% for image_form in formset %}
                     <div class="image-form">
                         <h3>Image {{ forloop.counter }}</h3>
+                        <img class="image-preview">
                         {{ image_form.as_p }}
                         {% if image_form.can_delete %}
                             <button type="button" class="remove-image">Remove</button>
@@ -107,6 +108,7 @@
             <div id="empty-form" style="display:none;">
                 <div class="image-form">
                     <h3>Image </h3>
+                    <img class="image-preview">
                     {{ formset.empty_form.as_p }}
                     <button type="button" class="remove-image">Remove</button>
                 </div>
@@ -117,7 +119,7 @@
             
             <div>
                 <button type="submit">Create Post</button>
-                <a href="{% url 'dashboard' %}">Cancel</a>
+                <a class= "cancel" href="{% url 'dashboard' %}">Cancel</a>
             </div>
         </form>
     </div>
@@ -125,6 +127,25 @@
 {%block extra_js%}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+
+    function attachPreviewListener(imageInput) {
+        imageInput.addEventListener('change', function (event) {
+            const file = event.target.files[0];
+            const preview = event.target.closest('.image-form').querySelector('.image-preview');
+
+            if (file) {
+                preview.style.display = 'block';
+                preview.src = URL.createObjectURL(file);
+            } else {
+                preview.style.display = 'none';
+                preview.src = '';
+            }
+        });
+    }
+
+    // Attach preview listeners to EXISTING formset inputs
+    document.querySelectorAll('.form-image-input').forEach(attachPreviewListener);
+
     let imageCount = 2;
     const addImageButton = document.getElementById('add-image');
     const imageFormsContainer = document.getElementById('image-forms');
@@ -138,6 +159,11 @@ document.addEventListener('DOMContentLoaded', function() {
         totalForms.value = formCount + 1;
         document.getElementsByTagName('h3')[imageCount - 1].innerText = 'Image ' + imageCount;
         imageCount++;
+        const newInput = imageFormsContainer
+            .querySelectorAll('.image-form')[formCount]
+            .querySelector('.form-image-input');
+
+        attachPreviewListener(newInput);
     });
 
     imageFormsContainer.addEventListener('click', function(e) {

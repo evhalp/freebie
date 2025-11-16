@@ -8,18 +8,11 @@ class PostCreationForm(forms.ModelForm):
         fields = ['title', 'description', 'location', 'start_time', 'end_time', 'tags']
         widgets = {
             'title': forms.TextInput(attrs={
-                'class': 'form-control',
+                'class': 'form-input',
                 'placeholder': 'Enter post title',
-                'style' : 'width: 100%;'
-                "padding: 0.5rem;"
-                'border: 1px solid #ccc; '
-                'border-radius: 5px;'
-                'font-size: 1rem;'
-                'width: 100%;'
-                
             }),
             'description': forms.Textarea(attrs={
-                'class': 'form-control',
+                'class': 'form-input',
                 'placeholder': 'Enter post description',
                 'rows': 5,
                 'columns': 40,
@@ -35,36 +28,16 @@ class PostCreationForm(forms.ModelForm):
                 
             }),
             'location': forms.TextInput(attrs={
-                'class': 'form-control',
+                'class': 'form-input',
                 'placeholder': 'Enter location',
-                'style' : 'width: 100%;'
-                "padding: 0.5rem;"
-                'border: 1px solid #ccc; '
-                'border-radius: 5px;'
-                'font-size: 1rem;'
-                'width: 100%;'
             }),
             'start_time': forms.DateTimeInput(attrs={
-                'class': 'form-control',
+                'class': 'form-time-input',
                 'type': 'datetime-local',
-                'style' : 'width: 100%;'
-                "padding: 0.5rem;"
-                'border: 1px solid #ccc; '
-                'border-radius: 5px;'
-                'font-family: Arial, sans-serif; '
-                'font-size: 1rem;'
-                'width: 100%;'
             }),
             'end_time': forms.DateTimeInput(attrs={
-                'class': 'form-control',
+                'class': 'form-time-input',
                 'type': 'datetime-local',
-                'style' : 'width: 100%;'
-                "padding: 0.5rem;"
-                'border: 1px solid #ccc; '
-                'border-radius: 5px;'
-                'font-family: Arial, sans-serif; '
-                'font-size: 1rem;'
-                'width: 100%;'
             }),
             'tags': forms.CheckboxSelectMultiple()
         }
@@ -97,12 +70,23 @@ class PostImageForm(forms.ModelForm):
         fields = ['image', 'caption']
         widgets = {
             'image': forms.FileInput(attrs={
-                'class': 'form-control'
+                'class': 'form-image-input',
             }),
             'caption': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Optional caption'
+                'class': 'label-and-input',
+                'placeholder': 'Image Caption',
+                'style' : 'width: 100%;'
+                "padding: 0.5rem;"
+                'border: 1px solid #ccc; '
+                'border-radius: 5px;'
+                'font-family: Arial, sans-serif; '
+                'font-size: 1rem;'
+                'width: 100%;'
             })
+        }
+        labels = {
+            'image': 'Image',
+            'caption': 'Caption',
         }
 
 PostImageFormSet = forms.inlineformset_factory(
