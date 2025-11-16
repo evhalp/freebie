@@ -104,7 +104,7 @@
 <div class="event-grid">
   {% if page_obj.object_list %}
     {% for post in page_obj.object_list %}
-      <div class="event-card" id = {{ post.id }}>
+      <div class="event-card" id = "{{ post.id }}">
         <div class="content">
             <div class="image-wrapper">
             {% if post.images.first %}
