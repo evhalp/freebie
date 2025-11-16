@@ -79,7 +79,7 @@
     height: 40px;
     transition: opacity var(--transition);
 }
-button[type="submit"], input[type="submit"], button {
+button[type="submit"], #add-image {
     background-color: var(--primary-color);
     color: white;
     border: none;
@@ -91,7 +91,6 @@ button[type="submit"], input[type="submit"], button {
     font-weight: bold;
     border-radius: 10px;
     justify-content: center;
-    margin: auto;
     transition: opacity var(--transition);
 }
 button[type="submit"]:hover, input[type="submit"]:hover, button:hover {
@@ -100,6 +99,10 @@ button[type="submit"]:hover, input[type="submit"]:hover, button:hover {
 #add-image {
     margin: 30px;
     width: 300px;
+}
+
+button[type="submit"]{
+    width: 200px;
 }
 .remove-image {
     width: 200px;
@@ -129,6 +132,14 @@ button[type="submit"]:hover, input[type="submit"]:hover, button:hover {
     justify-content: flex-start;
     margin: 20px;
     gap: 10px;
+}
+.footer-buttons{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+    width: 50%;
+    margin-bottom: 2rem;
 }
 /* 
 label {
