@@ -13,7 +13,7 @@ class Tag(models.Model):
         ordering = ['name']
 
     def __str__(self):
-        return f'{self.name} ({self.slug})'
+        return self.name
 
 class Post(models.Model):
     user = models.ForeignKey(

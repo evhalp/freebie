@@ -1,0 +1,275 @@
+.create-post-form {
+    border-radius: 10px;
+    margin: 2rem auto;
+    max-width: 600px;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    background-color: #ffffff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    gap: 1.5rem;
+}
+
+.create-post-form label {
+    text-align: left;
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.create-post-form input[type="text"],
+.create-post-form input[type="email"],
+.create-post-form input[type="datetime-local"],
+.create-post-form textarea,
+.create-post-form select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid;
+    border-radius: 5px;
+    font-size: 1rem;
+    box-sizing: border-box;
+    font-family: inherit;
+    transition: outline var(--transition);
+}
+
+.create-post-form input[type="text"]:focus,
+.create-post-form input[type="email"]:focus,
+.create-post-form input[type="datetime-local"]:focus,
+.create-post-form textarea:focus,
+.create-post-form select:focus {
+    outline: 2px solid var(--primary-color);
+}
+
+.create-post-form textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+.create-post-form select {
+    cursor: pointer;
+}
+
+.create-post-form input::placeholder,
+.create-post-form textarea::placeholder {
+    font-style: italic;
+    font-size: 0.9rem;
+    opacity: 0.7;
+}
+
+.form-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.form-section-title {
+    text-align: left;
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    font-size: 1rem;
+    margin-top: 0;
+}
+
+.form-row {
+    display: flex;
+    gap: 1rem;
+}
+
+.form-row div {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 1.5rem;
+}
+
+.create-post-form button[type="submit"],
+.create-post-form input[type="submit"] {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    cursor: pointer;
+    padding: 0.75rem 2rem;
+    border-radius: 5px;
+    font-size: 1rem;
+    transition: opacity var(--transition);
+}
+
+.create-post-form button[type="submit"]:hover,
+.create-post-form input[type="submit"]:hover {
+    opacity: 0.7;
+}
+
+.form-error {
+    color: red;
+    font-size: 0.9rem;
+    margin-top: 0.25rem;
+}
+
+.messages {
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    border-radius: 5px;
+    background-color: #f0f0f0;
+}
+
+.message {
+    padding: 0.5rem;
+    margin: 0.25rem 0;
+}
+
+.image-formset {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 0;
+    background-color: transparent;
+    border-radius: 0;
+}
+
+.image-form-item {
+    padding: 0;
+    border: none;
+    border-radius: 0;
+    background-color: transparent;
+}
+
+.image-form-item h3 {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    text-align: left;
+    font-size: 0.9rem;
+    font-style: italic;
+    font-weight: normal;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.hidden { display: none; }
+
+.file-input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.file-input-wrapper input[type="file"] {
+    position: absolute;
+    left: -9999px;
+}
+
+.file-input-label {
+    background-color: var(--primary-color);
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: opacity var(--transition);
+}
+
+.file-input-label:hover { opacity: 0.85; }
+
+.file-name {
+    font-size: 0.9rem;
+    color: var(--secondary-color);
+}
+
+.remove-image-btn {
+    background-color: #dc2626;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 0.4rem 0.75rem;
+    cursor: pointer;
+    transition: background-color var(--transition);
+}
+
+.remove-image-btn:hover {
+    background-color: #991b1b;
+}
+
+.add-image-btn {
+    align-self: center;
+    width: fit-content;
+    background-color: var(--primary-color);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 0.6rem 1.2rem;
+    cursor: pointer;
+    font-size: 1rem;
+    margin-top: 0.5rem;
+    transition: opacity var(--transition);
+}
+
+.add-image-btn:hover { opacity: 0.85; }
+
+.create-post-form [id*="id_tags"] {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    width: 100%;
+    padding: 0;
+    border: none;
+}
+
+.create-post-form [id*="id_tags"] fieldset,
+.create-post-form [id*="id_tags"] ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    border: none;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+.create-post-form [id*="id_tags"] li {
+    display: flex;
+    align-items: center;
+    list-style: none;
+    margin: 0;
+}
+
+.create-post-form [id*="id_tags"] label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0;
+    background-color: transparent;
+    color: var(--text-color);
+    border-radius: 0;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    margin: 0;
+    transition: color var(--transition);
+}
+
+.create-post-form [id*="id_tags"] label:hover {
+    color: var(--primary-color);
+}
+
+.create-post-form [id*="id_tags"] input[type="checkbox"] {
+    cursor: pointer;
+    accent-color: var(--primary-color);
+    width: 18px;
+    height: 18px;
+    margin: 0;
+}
+
+.create-post-form [id*="id_tags"] input[type="checkbox"]:checked {
+    accent-color: var(--primary-color);
+}
