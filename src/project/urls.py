@@ -23,6 +23,7 @@ from django.conf import settings
 urlpatterns = [
     path('', views.dashboard, name='dashboard'),
     path('admin/', admin.site.urls),
+    path('users/password_change/', views.password_change, name='password_change'),
     path('users/', include('django.contrib.auth.urls')),
     path('search/', include('search.urls')),
     path('posts/', include('posts.urls')),

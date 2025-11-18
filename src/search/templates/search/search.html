@@ -107,7 +107,7 @@
       <div class="event-card" id = {{ post.id }}>
         <div class="content">
             <div class="image-wrapper">
-            {% if post.images.first %}
+            {% if post.images.first and post.images.first.image and post.images.first.image.name %}
               <img class='post-image' src="{{ post.images.first.image.url }}" alt="{{ post.images.first.caption|default:post.title }}">
             {% else %}
               <img class='post-image' src="{{ MEDIA_URL }}default.png" alt="{{ post.title }}">
@@ -120,8 +120,8 @@
                 </p>  
             {% endif %}
             <p id="post-description">
-                {% if post.description|length > 180 %}
-                {{ post.description|slice:":180" }}…
+                {% if post.description|length > 100 %}
+                {{ post.description|slice:":100" }}…
                 {% else %}
                 {{ post.description }}
                 {% endif %}

@@ -92,6 +92,12 @@ h1, h2, h3 {
   display: flex;
   gap: 1.2rem;
   list-style: none;
+  align-items: center;
+}
+
+.navbar li {
+  display: flex;
+  align-items: center;
 }
 
 .navbar li a {
@@ -107,6 +113,25 @@ h1, h2, h3 {
 
 .navbar li a:hover {
     opacity: 0.7;
+}
+
+.profile-link {
+  display: flex;
+  align-items: center;
+}
+
+.profile-picture {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--border-color);
+  transition: border-color var(--transition), transform var(--transition);
+}
+
+.profile-picture:hover {
+  border-color: var(--primary-color);
+  transform: scale(1.05);
 }
 
 /* ---- CATEGORY TAGS ---- */

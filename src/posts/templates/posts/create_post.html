@@ -84,6 +84,9 @@
                         <h3>Image {{ forloop.counter }}</h3>
 
                         <div class="file-input-wrapper">
+                            {# Render the file input with original id/name to keep backend intact #}
+                            {{ image_form.image }}
+                            {# A themed label acts as the button to open file picker #}
                             <label class="file-input-label" for="{{ image_form.image.id_for_label }}">Choose Image</label>
                             <span class="file-name" data-file-name> No file chosen </span>
                             <button type="button" class="remove-image-btn" data-remove>Remove</button>

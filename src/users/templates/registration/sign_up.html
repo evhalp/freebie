@@ -9,6 +9,37 @@
 
 {% block content %}
 <h2>Sign Up</h2>
+
+    {% if form.errors %}
+        <div class="form-errors">
+            {% if form.username.errors %}
+                {% for error in form.username.errors %}
+                    <p class="error-message">{{ error }}</p>
+                {% endfor %}
+            {% endif %}
+            {% if form.email.errors %}
+                {% for error in form.email.errors %}
+                    <p class="error-message">{{ error }}</p>
+                {% endfor %}
+            {% endif %}
+            {% if form.password1.errors %}
+                {% for error in form.password1.errors %}
+                    <p class="error-message">{{ error }}</p>
+                {% endfor %}
+            {% endif %}
+            {% if form.password2.errors %}
+                {% for error in form.password2.errors %}
+                    <p class="error-message">{{ error }}</p>
+                {% endfor %}
+            {% endif %}
+            {% if form.non_field_errors %}
+                {% for error in form.non_field_errors %}
+                    <p class="error-message">{{ error }}</p>
+                {% endfor %}
+            {% endif %}
+        </div>
+    {% endif %}
+
     <form method="post" class="password-change-form">
         {% csrf_token %}
         <div>
