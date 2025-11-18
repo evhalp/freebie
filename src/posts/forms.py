@@ -8,25 +8,36 @@ class PostCreationForm(forms.ModelForm):
         fields = ['title', 'description', 'location', 'start_time', 'end_time', 'tags']
         widgets = {
             'title': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Enter post title'
+                'class': 'form-input',
+                'placeholder': 'Enter post title',
             }),
             'description': forms.Textarea(attrs={
-                'class': 'form-control',
+                'class': 'form-input',
                 'placeholder': 'Enter post description',
-                'rows': 5
+                'rows': 5,
+                'columns': 40,
+                'style': (
+                    'width: 100%; '
+                    'padding: 0.5rem; '
+                    'border: 1px solid #ccc; '
+                    'border-radius: 5px; '
+                    'font-size: 1rem; '
+                    'font-family: Arial, sans-serif; '
+                    'resize: none;'
+                ),
+                
             }),
             'location': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Enter location'
+                'class': 'form-input',
+                'placeholder': 'Enter location',
             }),
             'start_time': forms.DateTimeInput(attrs={
-                'class': 'form-control',
-                'type': 'datetime-local'
+                'class': 'form-time-input',
+                'type': 'datetime-local',
             }),
             'end_time': forms.DateTimeInput(attrs={
-                'class': 'form-control',
-                'type': 'datetime-local'
+                'class': 'form-time-input',
+                'type': 'datetime-local',
             }),
             'tags': forms.CheckboxSelectMultiple()
         }
@@ -59,18 +70,29 @@ class PostImageForm(forms.ModelForm):
         fields = ['image', 'caption']
         widgets = {
             'image': forms.FileInput(attrs={
-                'class': 'form-control'
+                'class': 'form-image-input',
             }),
             'caption': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Optional caption'
+                'class': 'label-and-input',
+                'placeholder': 'Image Caption',
+                'style' : 'width: 100%;'
+                "padding: 0.5rem;"
+                'border: 1px solid #ccc; '
+                'border-radius: 5px;'
+                'font-family: Arial, sans-serif; '
+                'font-size: 1rem;'
+                'width: 100%;'
             })
+        }
+        labels = {
+            'image': 'Image',
+            'caption': 'Caption',
         }
 
 PostImageFormSet = forms.inlineformset_factory(
     Post,
     PostImage,
     form=PostImageForm,
-    extra=3,
+    extra=1,
     can_delete=False
 )

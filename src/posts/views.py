@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import Post, Reaction
 from .forms import PostCreationForm, PostImageFormSet
-from users.models import UserProfile
+from users.models import User, UserProfile
 
 @login_required
 def create_post_view(request):
@@ -53,6 +53,18 @@ def post_view(request, id):
     if request.user.is_authenticated:
         user_liked = post.reactions.filter(user=request.user, sentiment='LIKE').exists()
 
+    if request.method == 'POST':
+        # --- Follow Button ---
+        if 'follow' in request.POST:
+            action = request.POST['follow']
+            if action == 'unfollow':
+                print(request.user.username, 'UNFOLLOWING', post_user.username)
+                request.user.userprofile.unfollow(profile)
+            elif action == 'follow':
+                print(request.user.username, 'FOLLOWING', post_user.username)
+                request.user.userprofile.follow(profile)
+
+        return redirect('posts', id=id)
     # --- Context ---
     context = {
         'post': post,

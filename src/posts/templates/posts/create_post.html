@@ -4,7 +4,7 @@
 {% block title %}Create Post{% endblock title %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/posts.css' %}">
+<link rel="stylesheet" href="{% static 'css/create_post.css' %}">
 {% endblock extra_css %}
 
 {% block content %}
@@ -21,51 +21,68 @@
             </div>
         {% endif %}
 
-        <form method="post" action="{% url 'create_post' %}" enctype="multipart/form-data">
+        <form class = "post-form-group" method="post" action="{% url 'create_post' %}" enctype="multipart/form-data">
             {% csrf_token %}
             
-            <div>
-                <label for="{{ form.title.id_for_label }}">{{ form.title.label }}</label>
-                {{ form.title }}
-                {% if form.title.errors %}
-                    {{ form.title.errors }}
-                {% endif %}
+            <div class = "description-fields">
+                <div class = "label-and-input">
+                    <div>
+                        <span style="color: red">*</span><label for="{{ form.title.id_for_label }}">{{ form.title.label }}</label>
+                    </div>
+                    {{ form.title }}
+                    {% if form.title.errors %}
+                        {{ form.title.errors }}
+                    {% endif %}
+                </div>
+                
+
+                <div class = "label-and-input">
+                    <div>
+                        <label for="{{ form.description.id_for_label }}">{{ form.description.label }}</label>
+                    </div>
+                    {{ form.description }}
+                    {% if form.description.errors %}
+                        {{ form.description.errors }}
+                    {% endif %}
+                </div>
+
+                <div class = "label-and-input">
+                    <div>
+                        <span style="color: red">* </span><label for="{{ form.location.id_for_label }}">{{ form.location.label }}</label>
+                    </div>
+                    {{ form.location }}
+                    {% if form.location.errors %}
+                        {{ form.location.errors }}
+                    {% endif %}
+                </div>
+                
             </div>
 
-            <div>
-                <label for="{{ form.description.id_for_label }}">{{ form.description.label }}</label>
-                {{ form.description }}
-                {% if form.description.errors %}
-                    {{ form.description.errors }}
-                {% endif %}
-            </div>
+            <div class = "time-fields">
+                <div>
+                    <div>
+                        <span style="color: red">* </span><label for="{{ form.start_time.id_for_label }}">{{ form.start_time.label }}</label>
+                    </div>
+                    {{ form.start_time }}
+                    {% if form.start_time.errors %}
+                        {{ form.start_time.errors }}
+                    {% endif %}
+                </div>
 
-            <div>
-                <label for="{{ form.location.id_for_label }}">{{ form.location.label }}</label>
-                {{ form.location }}
-                {% if form.location.errors %}
-                    {{ form.location.errors }}
-                {% endif %}
+                <div>
+                    <div>
+                        <span style="color: red">* </span><label for="{{ form.end_time.id_for_label }}">{{ form.end_time.label }}</label>
+                    </div>
+                    {{ form.end_time }}
+                    {% if form.end_time.errors %}
+                        {{ form.end_time.errors }}
+                    {% endif %}
+                </div>
             </div>
-
-            <div>
-                <label for="{{ form.start_time.id_for_label }}">{{ form.start_time.label }}</label>
-                {{ form.start_time }}
-                {% if form.start_time.errors %}
-                    {{ form.start_time.errors }}
-                {% endif %}
-            </div>
-
-            <div>
-                <label for="{{ form.end_time.id_for_label }}">{{ form.end_time.label }}</label>
-                {{ form.end_time }}
-                {% if form.end_time.errors %}
-                    {{ form.end_time.errors }}
-                {% endif %}
-            </div>
-
-            <div>
-                <label>{{ form.tags.label }}</label>
+            
+            <h2>Tags</h2>
+            <div class = "tags-field">
+                <!-- <label>{{ form.tags.label }}</label> -->
                 {{ form.tags }}
                 {% if form.end_time.errors %}
                     {{ form.end_time.errors }}
@@ -73,24 +90,98 @@
             </div>
             
             <h2>Images</h2>
-            {{ formset.management_form }}
-            {% for image_form in formset %}
-                <div>
-                    <h3>Image {{ forloop.counter }}</h3>
-                    {{ image_form.as_p }}
-                </div>
-            {% endfor %}
+            <div id="image-forms">
+                {{ formset.management_form }}
+                {% for image_form in formset %}
+                    <div class="image-form">
+                        <h3>Image {{ forloop.counter }}</h3>
+                        <img class="image-preview">
+                        {{ image_form.as_p }}
+                        {% if image_form.can_delete %}
+                            <button type="button" class="remove-image">Remove</button>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
 
-            {% if form.non_field_errors %}
-                <div>
-                    {{ form.non_field_errors }}
+            <!-- Hidden empty form template -->
+            <div id="empty-form" style="display:none;">
+                <div class="image-form">
+                    <h3>Image </h3>
+                    <img class="image-preview">
+                    {{ formset.empty_form.as_p }}
+                    <button type="button" class="remove-image">Remove</button>
                 </div>
-            {% endif %}
+            </div>
             
-            <div>
+
+            <button type="button" id="add-image">Add Another Image</button>
+
+            
+            <div class = "footer-buttons">
                 <button type="submit">Create Post</button>
-                <a href="{% url 'dashboard' %}">Cancel</a>
+                <a class= "cancel" href="{% url 'dashboard' %}">Cancel</a>
             </div>
         </form>
     </div>
 {% endblock content %}
+{%block extra_js%}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+
+    function attachPreviewListener(imageInput) {
+        imageInput.addEventListener('change', function (event) {
+            const file = event.target.files[0];
+            const preview = event.target.closest('.image-form').querySelector('.image-preview');
+
+            if (file) {
+                preview.style.display = 'block';
+                preview.src = URL.createObjectURL(file);
+            } else {
+                preview.style.display = 'none';
+                preview.src = '';
+            }
+        });
+    }
+
+    // Attach preview listeners to EXISTING formset inputs
+    document.querySelectorAll('.form-image-input').forEach(attachPreviewListener);
+
+    let imageCount = 2;
+    const addImageButton = document.getElementById('add-image');
+    const imageFormsContainer = document.getElementById('image-forms');
+    const totalForms = document.querySelector('input[name$="-TOTAL_FORMS"]');  // ✅ more robust
+    const emptyForm = document.getElementById('empty-form').innerHTML;
+
+    addImageButton.addEventListener('click', function() {
+        const formCount = parseInt(totalForms.value);
+        const newFormHTML = emptyForm.replace(/__prefix__/g, formCount);
+        imageFormsContainer.insertAdjacentHTML('beforeend', newFormHTML);
+        totalForms.value = formCount + 1;
+        document.getElementsByTagName('h3')[imageCount - 1].innerText = 'Image ' + imageCount;
+        imageCount++;
+        const newInput = imageFormsContainer
+            .querySelectorAll('.image-form')[formCount]
+            .querySelector('.form-image-input');
+
+        attachPreviewListener(newInput);
+    });
+
+    imageFormsContainer.addEventListener('click', function(e) {
+        if (e.target.classList.contains('remove-image')) {
+            e.target.closest('.image-form').remove();
+            const formCount = imageFormsContainer.querySelectorAll('.image-form').length;
+            totalForms.value = formCount;
+            imageCount--;
+            // Update image numbers
+            const headers = imageFormsContainer.querySelectorAll('h3'); 
+            headers.forEach((header, index) => {
+                header.innerText = 'Image ' + (index + 1);
+            });
+        }
+    });
+});
+
+</script>
+
+{% endblock extra_js%}

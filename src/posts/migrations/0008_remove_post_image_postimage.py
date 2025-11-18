@@ -27,7 +27,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 'ordering': ['order', 'created_at'],
-                'unique_together': {('post', 'order')},
+                'unique_together': {('order', 'post')},
             },
         ),
     ]

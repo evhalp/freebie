@@ -23,12 +23,19 @@
                     <img class = "image" src = "{{profile.image.url}}" alt = "user-image"/>
                 </div>
                 <div class = "username">
-                    {{user.username}}
+                    {{post_user.username}}
                 </div>
             </div>
-            <div class="follow-button-container">
-                <button>Follow</button>
-            </div>
+            {% if user.is_authenticated and user != post_user  %}
+                <form class="follow-button-container" action="{% url 'posts' id=post.id %}" method="POST">
+                    {% csrf_token %}
+                    {% if user.userprofile in profile.followers.all%}
+                        <button type="submit" name="follow" value="unfollow">Unfollow</button>
+                    {% else %}
+                        <button type="submit" name="follow" value="follow">Follow</button>
+                    {% endif %}
+                </form>
+            {% endif %}
         </div>
         <div class = "description-container">
             {{post.description}}
