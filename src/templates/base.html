@@ -38,13 +38,22 @@
         <li>
           <div class = "profile-container">
         <div class = "profile-icon">
-          <a href = "https://google.com">
-            <img src="https://t4.ftcdn.net/jpg/14/91/44/67/360_F_1491446725_6cWHMTUqYOoQqt2iAFrZWXOEUHYOkwWd.jpg" alt="">
+          {%if user.is_authenticated%}
+            <a href = "{% url 'user_profile' user.username %}">
+          {%else%}
+            <a href = "{% url 'login' %}">
+          {%endif%}
+          {%if user.userprofile.image%}
+            <img src="{{user.userprofile.image.url}} " alt="user profile image">
+          {%else%}
+            <img src="https://t4.ftcdn.net/jpg/14/91/44/67/360_F_1491446725_6cWHMTUqYOoQqt2iAFrZWXOEUHYOkwWd.jpg" alt="user profile image">
+          {%endif%}
+          
           </a>
         </div>
         <div class = "hidden-profile-options">
           {% if user.is_authenticated %}
-          <button href = "">View Profile</button>
+          <button><a href = "{% url  'user_profile' user.username %}">View Profile</a></button>
           <button href = "">Settings</button>
           <!-- <button><a href = "{% url 'create_post' %}">Create Post</a></button> -->
           <button><a href = "{% url 'password_change' %}">Change Password</a></button>
