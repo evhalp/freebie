@@ -120,15 +120,15 @@
                 </p>  
             {% endif %}
             <p id="post-description">
-                {% if post.description|length > 180 %}
-                {{ post.description|slice:":180" }}…
+                {% if post.description|length > 150 %}
+                {{ post.description|slice:":150" }}…
                 {% else %}
                 {{ post.description }}
                 {% endif %}
             </p>
             <div id="tags">
                 {% if post.tags.all %}
-                  {% for t in post.tags.all %}
+                  {% for t in post.tags.all|slice:":3" %}
                       <span class="tag" title="{{ t.description }}" style="background-color: {{ t.bg_color }}; color: {{ t.text_color }}">{{ t.name }}</span>
                   {% endfor %}
                 {% endif %}
