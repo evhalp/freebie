@@ -32,8 +32,22 @@
                 <li><a href="{% url 'sign_up' %}">Sign up</a>
             {% endif %}
         </li>
-
+        
       </ul>
+      {% if user.is_authenticated %}
+      <a class = "profile-container" href="https://google.com">
+        <div class = "profile-icon">
+          <img src="https://t4.ftcdn.net/jpg/14/91/44/67/360_F_1491446725_6cWHMTUqYOoQqt2iAFrZWXOEUHYOkwWd.jpg" alt="">
+          <div class = "hidden-profile-options">
+            <p>View Profile</p>
+            <p>Settings</p>
+            <p>Create Post</p>
+            <!-- <p>Notifications</p> -->
+            <p>Logout</p>
+          </div>
+        </div>
+      </a>
+      {% endif %}
     </div>
   </nav>
 
