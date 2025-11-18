@@ -1,4 +1,5 @@
 .post-container{
+    padding-top: 10px;
     display: flex;
     width: 100%;
     height: 100%;
@@ -8,19 +9,28 @@
 }
 .image-container{
     width: 80%;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    scroll-behavior: auto;
+    overflow: scroll;
+    overflow-y: hidden;
+    gap: 50px;
 }
 .image-container img{
-    width: 100%;
-    height: auto;
+    height: 400px;
+    width: auto;
+
 }
 .post-info{
-    padding-left: 5px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     width: 30%;
-
+    background-color: rgb(240, 240, 240);
 }
 
 .user-container{
@@ -30,7 +40,16 @@
     align-items: center;
     justify-content: space-between;
     padding: 10px;
-    background-color: rgb(161, 161, 161);
+    border-radius: 10px;
+    background-color: rgb(234, 234, 234);
+    border-style:solid; 
+    border-width: 2px;
+    border-color:  black;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+.user-container:hover{
+    background-color: rgb(220, 220, 220);
 }
 .profile{
     display: flex;
@@ -42,12 +61,32 @@
     border-radius: 20px;
     height: 60px;
     width: 60px;
+    justify-content: center;
+    align-items: center;
 }
 .profile-image-container img{
-    width: inherit;
+    height: 100%;
 }
 .username{
     padding-left: 5px;
+}
+button{
+  text-align: center;
+  padding: 6px 10px;
+  width: 100%;
+  cursor: pointer;
+  border: 1px solid #1b42ac;
+  border-radius: 5px;
+  background: none;
+  color: #1d4ed8;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+button:hover {
+  background-color: #1d4ed8;
+  color: white;
+  border-radius: 5px;
 }
 .description-container{
     width: 100%;
@@ -55,4 +94,66 @@
     overflow-y: auto;
     scrollbar-width: none;
     scroll-behavior: smooth;
+}
+.interactions{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 20px;
+    padding-bottom: 20px;
+}
+.interactions p{
+    color: rgb(154, 154, 154);
+    font-size: 10pt;
+}
+#like-button {
+  display: flex;
+  text-align: right;
+  font-size: 1.3rem;
+  color: rgb(154, 154, 154)
+}
+
+#like-button i{
+  padding-right: 3px;
+  font-size: 1.5rem;
+}
+
+#like-button i:hover{
+  color: var(--primary-color);
+  transform: scale(1.1);
+  cursor: pointer;
+}
+.attending-container{
+    display: flex;
+    text-align: right;
+    font-size: 1.3rem;
+    color: rgb(154, 154, 154);
+    gap: 5px;
+}
+
+
+
+/* Remove hover visual changes specifically for the like button */
+.like-toggle-button,
+.like-toggle-button i {
+    transition: none !important;
+}
+
+.like-toggle-button:hover,
+.like-toggle-button:hover i,
+#like-button i:hover {
+    color: inherit !important;
+    background-color: transparent !important;
+    transform: none !important;
+    cursor: default !important;
+}
+
+/* Liked appearance: filled primary color with white icon */
+.like-toggle-button.liked {
+    background-color: var(--primary-color, #1d4ed8) !important;
+    color: white !important;
+    border-color: var(--primary-color, #1d4ed8) !important;
+}
+.like-toggle-button.liked i {
+    color: inherit !important;
 }

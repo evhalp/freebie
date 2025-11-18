@@ -1,6 +1,13 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from .models import Tag, Post, Comment, Reaction
+from .models import Tag, Post, PostImage, Comment, Reaction
+
+class PostImageInline(admin.TabularInline):
+    model = PostImage
+    extra = 1
+    fields = ['image', 'order', 'caption']
+    readonly_fields = ['order']
+    ordering = ['order']
 
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
@@ -23,6 +30,9 @@ class PostAdmin(admin.ModelAdmin):
     list_filter = ['created_at', 'start_time']
     search_fields = ['title', 'description', 'location', 'user__username']
     filter_horizontal = ['tags']
+    inlines = [PostImageInline]
+    filter_horizontal = ['tags']
+    inlines = [PostImageInline]
 
     def description_preview(self, obj):
         return f'{obj.description[:50]}...' if len(obj.description) > 50 else obj.description

@@ -18,6 +18,7 @@
         type="submit"
         name="sort"
         value="popular"
+        formnovalidate
         class="{% if sort == 'popular' %}active-sort{% endif %}"
         id = "popular"
       >Popular</button>
@@ -26,6 +27,7 @@
         type="submit"
         name="sort"
         value="now"
+        formnovalidate
         class="{% if sort == 'now' %}active-sort{% endif %}"
         id = "happening"
       >Happening Now</button>
@@ -34,6 +36,7 @@
         type="submit"
         name="sort"
         value="new"
+        formnovalidate
         class="{% if sort == 'new' %}active-sort{% endif %}"
         id = "new"
       >Newest</button>
@@ -101,7 +104,7 @@
 <div class="event-grid">
   {% if page_obj.object_list %}
     {% for post in page_obj.object_list %}
-      <div class="event-card">
+      <div class="event-card" id = {{ post.id }}>
         <div class="content">
             <div class="image-wrapper">
             {% if post.images.first %}
@@ -173,6 +176,8 @@
 
 {% block extra_js %}
 <script>
+
+//Triggers after loading frontend
 document.addEventListener("DOMContentLoaded", () => {
   const mainBtn = document.getElementById("main-tag");
   const subBtns = document.querySelectorAll(".sub-tag");
@@ -196,6 +201,10 @@ document.addEventListener("DOMContentLoaded", () => {
       form.submit();
     });
   });
+  const events = document.querySelectorAll(".event-card");
+  events.forEach(e => {e.addEventListener("click", () => {
+    window.location.assign("/posts/" + e.id);
+  })})
 });
 </script>
 {% endblock extra_js %}
