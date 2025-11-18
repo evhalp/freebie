@@ -92,6 +92,7 @@ h1, h2, h3 {
   display: flex;
   gap: 1.2rem;
   list-style: none;
+  align-items: center;
 }
 
 .navbar li a {
@@ -108,7 +109,85 @@ h1, h2, h3 {
 .navbar li a:hover {
     opacity: 0.7;
 }
+/* ---- PROFILE MENU ---- */
+.profile-container{
+  padding: 20px;
+  position: relative;
+  display: inline-block;
+}
+.profile-container .hidden-profile-options{
+  display: none;
+  position: absolute;
+  background-color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+.profile-container button, .logout-form input[type ="submit"] {
+  border: 1px solid #1b42ac;
+  border-radius: 5px;
+  background-color: white;
+  color: #1d4ed8;
+  cursor: pointer;
+  padding: 6px 10px;
+  font-size: 0.9rem;
+  width: 100px;
+  text-align: center;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+.profile-container:hover .hidden-profile-options{
+  display: flex;
+}
+.hidden-profile-options {
+  display: none;
+  position: absolute; 
+  top: 80%; 
+  left: 0;
+  background: none;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  z-index: 100;
+  min-width: 100px;
+  flex-direction: column;
+}
+.hidden-profile-options:hover{
+  display: flex;
+}
+.hidden-profile-options button,
+.hidden-profile-options input[type="submit"], .logout-form input[type ="submit"] {
+  width: 100%;
+  padding: 0.5rem 1rem;
+  background-color: white;
+  color: blue;
+  font-size: 12pt;
+  padding: 10px;
+  border: none;
+}
+.hidden-profile-options button:hover, .hidden-profile-options button:hover .logout-form input[type ="submit"] {
+  background-color: #1d4ed8;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.hidden-profile-options button:hover a{
+  color: white;
+  opacity: 1;
+}
+button a:hover{
+  color: white;
+  opacity: 1;
+}
 
+
+.profile-icon{
+  width: 50px;
+  height: 50px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 100px;
+  overflow: hidden;
+}
+.profile-icon img{
+  width: 100%;
+  height: auto;
+}
 /* ---- CATEGORY TAGS ---- */
 .tag {
   display: inline-block;
@@ -132,7 +211,7 @@ footer {
   margin-top: auto;
 }
 
-.logout-form input[type ="submit"] {
+/* .logout-form input[type ="submit"] {
   background-color: white;
   border: 0px;
   cursor: pointer;
@@ -142,11 +221,11 @@ footer {
   font-family: inherit;
   font-size: 1rem;
   padding: 0;
-}
+} */
 
-.logout-form:hover {
+/* .logout-form:hover {
   opacity: 0.7;
-}
+} */
 
 /* ---- RESPONSIVE ---- */
 @media (max-width: 600px) {
