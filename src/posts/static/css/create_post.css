@@ -79,22 +79,35 @@
     height: 40px;
     transition: opacity var(--transition);
 }
-button[type="submit"], #add-image {
-    background-color: var(--primary-color);
-    color: white;
-    border: none;
-    cursor: pointer;
-    width: 100%;
-    padding: 10px;
-    height: 40px;
-    font-size: 16pt;
-    font-weight: bold;
-    border-radius: 10px;
-    justify-content: center;
-    transition: opacity var(--transition);
+
+.search-filters button {
+  background-color: black;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 6px 10px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  width: auto;
 }
-button[type="submit"]:hover, input[type="submit"]:hover, button:hover {
-    opacity: 0.7;
+
+.search-filters button:hover {
+  background-color: #1b42ac;
+}
+button[type="submit"], #add-image, .cancel {
+    background-color: black;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 6px 10px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  width: auto;
+}
+button[type="submit"]:hover, input[type="submit"]:hover, button:hover, #add-image:hover {
+    background-color: #1b42ac;
 }
 #add-image {
     margin: 30px;
@@ -185,9 +198,10 @@ a {
     font-weight: bold;
     
 }
-.cancel {
-    color: red;
-    font-size: 16pt;
+.cancel:hover {
+    background-color: red;
+    color: white;
+    opacity: 1;
 }
 
 a:hover {
