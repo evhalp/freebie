@@ -8,6 +8,7 @@
     border-radius: 10px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     overflow: hidden;
+    position: relative;
 }
 
 .image-section {
@@ -286,6 +287,41 @@
 
 .like-count {
     font-weight: 600;
+}
+
+.toast-message {
+    position: absolute;
+    top: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 15px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    animation: fadeInOut 3s ease-in-out forwards;
+    min-width: 200px;
+    text-align: center;
+}
+
+.toast-success {
+    color: #15803d;
+    background-color: #dcfce7;
+    border: 2px solid #86efac;
+}
+
+.toast-error {
+    color: #dc2626;
+    background-color: #fee2e2;
+    border: 2px solid #fca5a5;
+}
+
+@keyframes fadeInOut {
+    0% { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+    10% { opacity: 1; transform: translateX(-50%) translateY(0); }
+    70% { opacity: 1; transform: translateX(-50%) translateY(0); }
+    100% { opacity: 0; transform: translateX(-50%) translateY(-10px); }
 }
 
 @media (max-width: 760px) {

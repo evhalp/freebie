@@ -10,6 +10,20 @@
 
 
 {% block content %}
+{% if messages %}
+    {% for message in messages %}
+        {% if 'followed' in message.message|lower and 'unfollowed' not in message.message|lower %}
+        <div class="toast-message toast-success" id="toast-message">
+            {{ message }}
+        </div>
+        {% elif 'unfollowed' in message.message|lower %}
+        <div class="toast-message toast-error" id="toast-message">
+            {{ message }}
+        </div>
+        {% endif %}
+    {% endfor %}
+{% endif %}
+
 <div class="post-container">
     <div class="image-section">
         {% if post.images.all %}
@@ -54,7 +68,13 @@
                 </div>
                 <span class="username-post">{{ author.username }}</span>
             </div>
-            <button class="follow-btn">Follow</button>
+            {% if user.is_authenticated and user != author %}
+            <form method="post" class="follow-form" style="margin-left:auto;">
+                {% csrf_token %}
+                <input type="hidden" name="follow_toggle" value="1">
+                <button type="submit" class="follow-btn">{% if is_following %}Unfollow{% else %}Follow{% endif %}</button>
+            </form>
+            {% endif %}
         </div>
 
         <h2 class="post-title">{{ post.title }}</h2>
@@ -172,6 +192,14 @@
         goingBtn.addEventListener('click', function () {
             this.classList.toggle('going');
         });
+    }
+
+    // Auto-remove toast message after animation
+    const toastMessage = document.getElementById('toast-message');
+    if (toastMessage) {
+        setTimeout(() => {
+            toastMessage.remove();
+        }, 3000);
     }
 </script>
 

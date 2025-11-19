@@ -71,18 +71,21 @@ def post_view(request, id):
     if request.user.is_authenticated:
         user_liked = post.reactions.filter(user=request.user, sentiment='LIKE').exists()
 
-    if request.method == 'POST':
-        # --- Follow Button ---
-        if 'follow' in request.POST:
-            action = request.POST['follow']
-            if action == 'unfollow':
-                print(request.user.username, 'UNFOLLOWING', post_user.username)
-                request.user.userprofile.unfollow(profile)
-            elif action == 'follow':
-                print(request.user.username, 'FOLLOWING', post_user.username)
-                request.user.userprofile.follow(profile)
+    if request.method == 'POST' and request.user.is_authenticated:
+        if 'follow_toggle' in request.POST and profile and request.user != post_author:
+            actor_profile = request.user.userprofile
+            target_profile = profile
+            if actor_profile.is_following(target_profile):
+                actor_profile.unfollow(target_profile)
+                messages.success(request, f"You unfollowed {post_author.username}.")
+            else:
+                actor_profile.follow(target_profile)
+                messages.success(request, f"You followed {post_author.username}.")
+            return redirect('posts', id=id)
 
-        return redirect('posts', id=id)
+    is_following = False
+    if request.user.is_authenticated and request.user != post_author and profile:
+        is_following = request.user.userprofile.is_following(profile)
     # --- Context ---
     context = {
         'post': post,
@@ -90,6 +93,7 @@ def post_view(request, id):
         'profile': profile,
         'like_count': like_count,
         'user_liked': user_liked,
+        'is_following': is_following,
     }
 
     return render(request, 'posts/posts.html', context)
