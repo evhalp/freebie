@@ -33,8 +33,7 @@
         </div>
 
         <div>
-            <label for="{{ form.description.id_for_label }}"><span style="color: red">*</span>{{ form.description.label
-                }}</label>
+            <label for="{{ form.description.id_for_label }}"><span style="color: red">*</span>Description</label>
             {{ form.description }}
             {% if form.description.errors %}
             <div class="form-error">{{ form.description.errors }}</div>
@@ -42,8 +41,7 @@
         </div>
 
         <div>
-            <label for="{{ form.location.id_for_label }}"><span style="color: red">*</span>{{ form.location.label
-                }}</label>
+            <label for="{{ form.location.id_for_label }}"><span style="color: red">*</span>Location</label>
             {{ form.location }}
             {% if form.location.errors %}
             <div class="form-error">{{ form.location.errors }}</div>
@@ -52,8 +50,7 @@
 
         <div class="form-row">
             <div>
-                <label for="{{ form.start_time.id_for_label }}"><span style="color: red">*</span>{{
-                    form.start_time.label }}</label>
+                <label for="{{ form.start_time.id_for_label }}"><span style="color: red">*</span>Start Time</label>
                 {{ form.start_time }}
                 {% if form.start_time.errors %}
                 <div class="form-error">{{ form.start_time.errors }}</div>
@@ -61,8 +58,7 @@
             </div>
 
             <div>
-                <label for="{{ form.end_time.id_for_label }}"><span style="color: red">*</span>{{ form.end_time.label
-                    }}</label>
+                <label for="{{ form.end_time.id_for_label }}"><span style="color: red">*</span>End Time</label>
                 {{ form.end_time }}
                 {% if form.end_time.errors %}
                 <div class="form-error">{{ form.end_time.errors }}</div>
@@ -84,7 +80,8 @@
         <div class="image-formset" id="image-formset">
             {{ formset.management_form }}
             {% for image_form in formset %}
-            <div class="image-form-item" data-form-index="{{ forloop.counter0 }}">
+            <div class="image-form-item {% if not forloop.first %}hidden{% endif %}"
+                data-form-index="{{ forloop.counter0 }}">
                 <h3>Image {{ forloop.counter }}</h3>
 
                 <div class="file-input-wrapper">
@@ -116,6 +113,9 @@
         <button type="submit">Create Post</button>
     </div>
 </form>
+{%endblock content %}
+
+{% block extra_js %}
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const formsetEl = document.getElementById('image-formset');
@@ -225,64 +225,4 @@
 
     });
 </script>
-{% endblock content %}
-{%block extra_js%}
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-
-        function attachPreviewListener(imageInput) {
-            imageInput.addEventListener('change', function (event) {
-                const file = event.target.files[0];
-                const preview = event.target.closest('.image-form').querySelector('.image-preview');
-
-                if (file) {
-                    preview.style.display = 'block';
-                    preview.src = URL.createObjectURL(file);
-                } else {
-                    preview.style.display = 'none';
-                    preview.src = '';
-                }
-            });
-        }
-
-        // Attach preview listeners to EXISTING formset inputs
-        document.querySelectorAll('.form-image-input').forEach(attachPreviewListener);
-
-        let imageCount = 2;
-        const addImageButton = document.getElementById('add-image');
-        const imageFormsContainer = document.getElementById('image-forms');
-        const totalForms = document.querySelector('input[name$="-TOTAL_FORMS"]');  // ✅ more robust
-        const emptyForm = document.getElementById('empty-form').innerHTML;
-
-        addImageButton.addEventListener('click', function () {
-            const formCount = parseInt(totalForms.value);
-            const newFormHTML = emptyForm.replace(/__prefix__/g, formCount);
-            imageFormsContainer.insertAdjacentHTML('beforeend', newFormHTML);
-            totalForms.value = formCount + 1;
-            document.getElementsByTagName('h3')[imageCount - 1].innerText = 'Image ' + imageCount;
-            imageCount++;
-            const newInput = imageFormsContainer
-                .querySelectorAll('.image-form')[formCount]
-                .querySelector('.form-image-input');
-
-            attachPreviewListener(newInput);
-        });
-
-        imageFormsContainer.addEventListener('click', function (e) {
-            if (e.target.classList.contains('remove-image')) {
-                e.target.closest('.image-form').remove();
-                const formCount = imageFormsContainer.querySelectorAll('.image-form').length;
-                totalForms.value = formCount;
-                imageCount--;
-                // Update image numbers
-                const headers = imageFormsContainer.querySelectorAll('h3');
-                headers.forEach((header, index) => {
-                    header.innerText = 'Image ' + (index + 1);
-                });
-            }
-        });
-    });
-
-</script>
-
-{% endblock extra_js%}
+{% endblock extra_js %}

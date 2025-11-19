@@ -93,6 +93,6 @@ PostImageFormSet = forms.inlineformset_factory(
     Post,
     PostImage,
     form=PostImageForm,
-    extra=1,
+    extra=5,
     can_delete=False
 )

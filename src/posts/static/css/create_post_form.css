@@ -154,7 +154,9 @@ h1 {
     margin-bottom: 2rem;
 }
 
-.hidden { display: none; }
+.hidden {
+    display: none;
+}
 
 .file-input-wrapper {
     display: flex;
@@ -179,7 +181,9 @@ h1 {
     transition: opacity var(--transition);
 }
 
-.file-input-label:hover { opacity: 0.85; }
+.file-input-label:hover {
+    opacity: 0.85;
+}
 
 .file-name {
     font-size: 0.9rem;
@@ -214,7 +218,9 @@ h1 {
     transition: opacity var(--transition);
 }
 
-.add-image-btn:hover { opacity: 0.85; }
+.add-image-btn:hover {
+    opacity: 0.85;
+}
 
 .create-post-form [id*="id_tags"] {
     display: flex;
