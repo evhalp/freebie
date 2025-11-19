@@ -1,159 +1,294 @@
-.post-container{
-    padding-top: 10px;
+.post-container {
     display: flex;
-    width: 100%;
-    height: 100%;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    min-height: 600px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
 }
-.image-container{
-    width: 80%;
-    display: flex;
-    justify-content: space-between;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    align-items: center;
-    scroll-behavior: auto;
-    overflow: scroll;
-    overflow-y: hidden;
-    gap: 50px;
-}
-.image-container img{
-    height: 400px;
-    width: auto;
 
-}
-.post-info{
+.image-section {
+    flex: 2;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 30%;
-    background-color: rgb(240, 240, 240);
+    background-color: #ffffff;
+    position: relative;
+    min-height: 600px;
+    max-height: 600px;
+    border-right: 2px solid #cbd5e1;
 }
 
-.user-container{
+.image-gallery {
+    flex: 1;
     display: flex;
-    width: 100%;
-    flex-direction: row;
     align-items: center;
-    justify-content: space-between;
-    padding: 10px;
-    border-radius: 10px;
-    background-color: rgb(234, 234, 234);
-    border-style:solid; 
-    border-width: 2px;
-    border-color:  black;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-.user-container:hover{
-    background-color: rgb(220, 220, 220);
-}
-.profile{
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-}
-.profile-image-container{
+    justify-content: center;
+    position: relative;
+    padding: 2rem;
     overflow: hidden;
-    border-radius: 20px;
-    height: 60px;
-    width: 60px;
-    justify-content: center;
+    background-color: #ffffff;
+}
+
+.gallery-image {
+    display: none;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: scale-down;
+    border-radius: 8px;
+}
+
+.gallery-image.active {
+    display: block;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.no-images {
+    display: flex;
     align-items: center;
-}
-.profile-image-container img{
-    height: 100%;
-}
-.username{
-    padding-left: 5px;
-}
-button{
-  text-align: center;
-  padding: 6px 10px;
-  width: 100%;
-  cursor: pointer;
-  border: 1px solid #1b42ac;
-  border-radius: 5px;
-  background: none;
-  color: #1d4ed8;
-  cursor: pointer;
-  font-size: 0.9rem;
-  transition: background-color 0.3s ease, color 0.3s ease;
-}
-button:hover {
-  background-color: #1d4ed8;
-  color: white;
-  border-radius: 5px;
-}
-.description-container{
+    justify-content: center;
+    color: #64748b;
+    font-size: 1.2rem;
     width: 100%;
-    height: 375px;
-    overflow-y: auto;
-    scrollbar-width: none;
-    scroll-behavior: smooth;
+    height: 100%;
+    text-align: center;
 }
-.interactions{
+
+.image-paginator {
     display: flex;
-    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    background-color: #ffffff;
+    border-top: 1px solid #e2e8f0;
+}
+
+.paginator-btn {
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    color: var(--primary-color);
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+}
+
+.paginator-btn:hover {
+    background-color: var(--primary-color);
+    color: #ffffff;
+    border-color: var(--primary-color);
+    transform: scale(1.1);
+}
+
+.paginator-btn:active {
+    transform: scale(0.95);
+}
+
+.paginator-dots {
+    display: flex;
+    gap: 0.6rem;
+    padding: 0 1rem;
+}
+
+.dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: #e2e8f0;
+    cursor: pointer;
+    transition: all 0.3s;
+    border: 2px solid transparent;
+}
+
+.dot.active {
+    background-color: var(--primary-color);
+    transform: scale(1.2);
+}
+
+.dot:hover {
+    background-color: #cbd5e1;
+    transform: scale(1.1);
+}
+
+.post-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    background-color: #fff;
+    padding: 2rem;
+}
+
+.post-header {
+    display: flex;
+    align-items: center;
     justify-content: space-between;
-    gap: 20px;
-    padding-bottom: 20px;
-}
-.interactions p{
-    color: rgb(154, 154, 154);
-    font-size: 10pt;
-}
-#like-button {
-  display: flex;
-  text-align: right;
-  font-size: 1.3rem;
-  color: rgb(154, 154, 154)
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #cbd5e1;
 }
 
-#like-button i{
-  padding-right: 3px;
-  font-size: 1.5rem;
-}
-
-#like-button i:hover{
-  color: var(--primary-color);
-  transform: scale(1.1);
-  cursor: pointer;
-}
-.attending-container{
+.user-info {
     display: flex;
-    text-align: right;
-    font-size: 1.3rem;
-    color: rgb(154, 154, 154);
-    gap: 5px;
+    align-items: center;
+    gap: 0.75rem;
 }
 
-
-
-/* Remove hover visual changes specifically for the like button */
-.like-toggle-button,
-.like-toggle-button i {
-    transition: none !important;
+.profile-image-container {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    overflow: hidden;
+    background-color: #e2e8f0;
 }
 
-.like-toggle-button:hover,
-.like-toggle-button:hover i,
-#like-button i:hover {
-    color: inherit !important;
-    background-color: transparent !important;
-    transform: none !important;
-    cursor: default !important;
+.profile-image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
-/* Liked appearance: filled primary color with white icon */
-.like-toggle-button.liked {
-    background-color: var(--primary-color, #1d4ed8) !important;
-    color: white !important;
-    border-color: var(--primary-color, #1d4ed8) !important;
+.default-avatar {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--primary-color);
+    color: #fff;
+    font-size: 1.5rem;
+    font-weight: bold;
 }
-.like-toggle-button.liked i {
-    color: inherit !important;
+
+.username {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--text-color);
+}
+
+.follow-btn {
+    background-color: var(--primary-color);
+    color: #fff;
+    border: none;
+    padding: 0.5rem 1.5rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: opacity 0.3s;
+    font-weight: 500;
+}
+
+.follow-btn:hover {
+    opacity: 0.85;
+}
+
+.post-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-color);
+    margin: 0;
+}
+
+.post-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #64748b;
+    font-size: 0.95rem;
+}
+
+.meta-item i {
+    color: var(--primary-color);
+    width: 20px;
+}
+
+.post-description {
+    color: var(--text-color);
+    line-height: 1.6;
+    flex: 1;
+    overflow-y: auto;
+    max-height: 200px;
+    text-align: left;
+}
+
+.post-actions {
+    display: flex;
+    gap: 0.75rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e2e8f0;
+}
+
+.action-group {
+    display: flex;
+}
+
+.like-form {
+    margin: 0;
+    padding: 0;
+}
+
+.action-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1rem;
+    height: 40px;
+    border: 1px solid var(--primary-color);
+    background: transparent;
+    color: var(--primary-color);
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: all 0.3s;
+    font-weight: 500;
+}
+
+.action-btn:hover {
+    background-color: var(--primary-color);
+    color: #fff;
+}
+
+.action-btn i {
+    font-size: 1.1rem;
+}
+
+.action-btn.liked {
+    background-color: var(--primary-color);
+    color: #fff;
+}
+
+.action-btn.going {
+    background-color: var(--primary-color);
+    color: #fff;
+}
+
+.like-count {
+    font-weight: 600;
+}
+
+@media (max-width: 760px) {
+    .post-container {
+        flex-direction: column;
+    }
+    
+    .image-section {
+        min-height: 400px;
+    }
 }

@@ -18,6 +18,17 @@
     <div class="container">
       <a href="{% url 'dashboard' %}" class="logo">Freebie!</a>
       <ul>
+        {% if user.is_authenticated %}
+        <li>
+          <a href="{% url 'user_profile' user.username %}" class="profile-link">
+            {% if user.userprofile.image and user.userprofile.image.name %}
+              <img src="{{ user.userprofile.image.url }}" alt="{{ user.username }}" class="profile-picture">
+            {% else %}
+              <img src="{% static 'default-profile.png' %}" alt="{{ user.username }}" class="profile-picture">
+            {% endif %}
+          </a>
+        </li>
+        {% endif %}
         <li class = "username">Hello, {{ user.username | default:"Guest" }}!</li>
         <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
         <li><a href="{% url 'search' %}">Search</a></li>
@@ -27,7 +38,6 @@
         <!-- <li>
             {% if user.is_authenticated %}
             <div class ="authentication-links">
-              <a href="{% url 'password_change' %}">Change password</a>
               {% include "registration/_logout.html" %}
             </div>
             {% else %}

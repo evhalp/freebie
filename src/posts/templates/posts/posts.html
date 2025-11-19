@@ -5,68 +5,174 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/posts.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 {% endblock extra_css %}
 
 
 {% block content %}
-<div class = "post-container">
-    <div class = "image-container">
-        <!-- replace image source with {{post.image.url}} -->
-        {% for image in post.images.all %}
-            <img class="image" src="{{ image.image.url }}" alt="{{ image.caption|default:'Post image' }}">
-        {% endfor %}
-    </div>
-    <div class = "post-info">
-        <div class = "user-container">
-            <div class = "profile">
-                <div class = "profile-image-container">
-                    <img class = "image" src = "{{profile.image.url}}" alt = "user-image"/>
-                </div>
-                <div class = "username">
-                    {{post_user.username}}
-                </div>
+<div class="post-container">
+    <div class="image-section">
+        {% if post.images.all %}
+        <div class="image-gallery">
+            {% for image in post.images.all %}
+            <img class="gallery-image {% if forloop.first %}active{% endif %}" src="{{ image.image.url }}"
+                alt="{{ image.caption|default:'Post image' }}" data-index="{{ forloop.counter0 }}">
+            {% endfor %}
+        </div>
+
+        {% if post.images.all.count > 1 %}
+        <div class="image-paginator">
+            <button class="paginator-btn prev-btn" onclick="changeImage(-1)">
+                <i class="fa-solid fa-chevron-left"></i>
+            </button>
+            <div class="paginator-dots">
+                {% for image in post.images.all %}
+                <span class="dot {% if forloop.first %}active{% endif %}" data-index="{{ forloop.counter0 }}"></span>
+                {% endfor %}
             </div>
-            {% if user.is_authenticated and user != post_user  %}
-                <form class="follow-button-container" action="{% url 'posts' id=post.id %}" method="POST">
-                    {% csrf_token %}
-                    {% if user.userprofile in profile.followers.all%}
-                        <button type="submit" name="follow" value="unfollow">Unfollow</button>
+            <button class="paginator-btn next-btn" onclick="changeImage(1)">
+                <i class="fa-solid fa-chevron-right"></i>
+            </button>
+        </div>
+        {% endif %}
+        {% else %}
+        <div class="no-images">
+            <p>No images were uploaded for this event</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="post-details">
+        <div class="post-header">
+            <div class="user-info">
+                <div class="profile-image-container">
+                    {% if profile and profile.image %}
+                    <img src="{{ profile.image.url }}" alt="{{ user.username }}">
                     {% else %}
-                        <button type="submit" name="follow" value="follow">Follow</button>
+                    <div class="default-avatar">{{ user.username|first|upper }}</div>
                     {% endif %}
-                </form>
-            {% endif %}
+                </div>
+                <span class="username">{{ user.username }}</span>
+            </div>
+            <button class="follow-btn">Follow</button>
         </div>
-        <div class = "description-container">
-            {{post.description}}
+
+        <h2 class="post-title">{{ post.title }}</h2>
+
+        <div class="post-meta">
+            <div class="meta-item">
+                <i class="fa-solid fa-location-dot"></i>
+                <span>{{ post.location|default:"Location not specified" }}</span>
+            </div>
+            <div class="meta-item">
+                <i class="fa-solid fa-clock"></i>
+                <span>{{ post.start_time|date:"M d, Y - g:i A" }}</span>
+            </div>
         </div>
-        <div class = "interactions">
-            <div id="like-button">
-                <form method="post" action="{% url 'post-like' post.id %}">
+
+        <div class="post-description">
+            {{ post.description }}
+        </div>
+
+        <div class="post-actions">
+            <div class="action-group">
+                <form method="post" action="{% url 'post-like' post.id %}" class="like-form">
                     {% csrf_token %}
-                    <button type="submit" class="like-toggle-button {% if user_liked %}liked{% endif %}">
+                    <button type="submit" class="action-btn like-btn {% if user_liked %}liked{% endif %}">
                         <i class="fa-solid fa-thumbs-up"></i>
+                        <span class="like-count">{{ like_count|default:0 }}</span>
                     </button>
-                    <span class="like-count">{{ like_count|default:0 }}</span>
                 </form>
             </div>
-            <!-- attending control (keeps previous layout; implement separately) -->
-            <div class = "attending-container">
-                <button class = "attending-button">I'm going!</button>
-            </div>
-        </div>
-        <div class = "comment-container">
-            <button class = "comment-button">Comment</button>
-        </div>
-        <div class = "other-info">
-            {{post.location}}
-            {{post.start_time}}
+
+            <button class="action-btn going-btn">
+                <i class="fa-solid fa-calendar-check"></i>
+                <span>I'm going!</span>
+            </button>
+
+            <button class="action-btn comment-btn">
+                <i class="fa-solid fa-comment"></i>
+                <span>Comment</span>
+            </button>
         </div>
     </div>
-    
 </div>
 
-{% endblock content %}
+<script>
+    let currentImageIndex = 0;
+    const images = document.querySelectorAll('.gallery-image');
+    const dots = document.querySelectorAll('.dot');
+    let autoPlayInterval = null;
+    let isAutoPlaying = true;
 
-{% block extra_js %}
-{% endblock extra_js %}
+    function showImage(index) {
+        images.forEach(img => img.classList.remove('active'));
+        dots.forEach(dot => dot.classList.remove('active'));
+
+        if (images[index]) {
+            images[index].classList.add('active');
+            dots[index].classList.add('active');
+            currentImageIndex = index;
+        }
+    }
+
+    function changeImage(direction) {
+        let newIndex = currentImageIndex + direction;
+
+        if (newIndex >= images.length) {
+            newIndex = 0;
+        } else if (newIndex < 0) {
+            newIndex = images.length - 1;
+        }
+
+        showImage(newIndex);
+    }
+
+    function goToImage(index) {
+        stopAutoPlay();
+        showImage(index);
+    }
+
+    function startAutoPlay() {
+        if (images.length > 1) {
+            autoPlayInterval = setInterval(() => {
+                changeImage(1);
+            }, 4000);
+        }
+    }
+
+    function stopAutoPlay() {
+        if (autoPlayInterval) {
+            clearInterval(autoPlayInterval);
+            autoPlayInterval = null;
+            isAutoPlaying = false;
+        }
+    }
+
+    document.querySelectorAll('.paginator-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            stopAutoPlay();
+        });
+    });
+
+    document.querySelectorAll('.dot').forEach(dot => {
+        dot.addEventListener('click', function () {
+            stopAutoPlay();
+            const index = parseInt(this.getAttribute('data-index'));
+            showImage(index);
+        });
+    });
+
+    if (images.length > 1) {
+        startAutoPlay();
+    }
+
+    const goingBtn = document.querySelector('.going-btn');
+    if (goingBtn) {
+        goingBtn.addEventListener('click', function () {
+            this.classList.toggle('going');
+        });
+    }
+</script>
+
+{% endblock content %}
