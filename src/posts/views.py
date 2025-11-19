@@ -59,9 +59,9 @@ def post_view(request, id):
     """Loads Post information related to specified id"""
     # --- Base queryset ---
     post = get_object_or_404(Post, id=id)
-    user = post.user
+    post_author = post.user
     try:
-        profile = UserProfile.objects.get(user=user)
+        profile = UserProfile.objects.get(user=post_author)
     except UserProfile.DoesNotExist:
         profile = None
 
@@ -86,10 +86,10 @@ def post_view(request, id):
     # --- Context ---
     context = {
         'post': post,
-        'user': user,
-        "profile": profile,
-        "like_count": like_count,
-        "user_liked": user_liked,
+        'author': post_author,
+        'profile': profile,
+        'like_count': like_count,
+        'user_liked': user_liked,
     }
 
     return render(request, 'posts/posts.html', context)

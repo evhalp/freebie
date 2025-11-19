@@ -132,10 +132,10 @@ h3 {
 
 .profile-container button,
 .logout-form input[type="submit"] {
-  border: 1px solid #1b42ac;
+  border: 1px solid var(--primary-color);
   border-radius: 5px;
   background-color: white;
-  color: #1d4ed8;
+  color: var(--primary-color);
   cursor: pointer;
   padding: 6px 10px;
   font-size: 0.9rem;
@@ -170,15 +170,21 @@ h3 {
   width: 100%;
   padding: 0.5rem 1rem;
   background-color: white;
-  color: blue;
+  color: var(--primary-color);
   font-size: 12pt;
   padding: 10px;
   border: none;
+  font-weight: 500;
+}
+
+.hidden-profile-options button a {
+  font-weight: 500;
+  color: var(--primary-color);
 }
 
 .hidden-profile-options button:hover,
 .hidden-profile-options button:hover .logout-form input[type="submit"] {
-  background-color: #1d4ed8;
+  background-color: var(--primary-color);
   color: white;
   border-radius: 5px;
   cursor: pointer;

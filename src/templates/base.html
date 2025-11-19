@@ -67,9 +67,6 @@
             <div class="hidden-profile-options">
               {% if user.is_authenticated %}
               <button><a href="{% url  'user_profile' user.username %}">View Profile</a></button>
-              <button href="">Settings</button>
-              <!-- <button><a href = "{% url 'create_post' %}">Create Post</a></button> -->
-              <button><a href="{% url 'password_change' %}">Change Password</a></button>
               <button><a href="">{% include "registration/_logout.html" %}</a></button>
               {%else%}
               <button><a href="{% url 'login' %}">Login</a></button>
