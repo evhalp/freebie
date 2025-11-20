@@ -4,184 +4,225 @@
 {% block title %}Create Post{% endblock title %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/create_post.css' %}">
+<link rel="stylesheet" href="{% static 'css/create_post_form.css' %}">
 {% endblock extra_css %}
 
 {% block content %}
-    <div>
-        <h1> Create New Post </h1>
+<h1>Create A New Post!</h1>
 
-        {% if messages %}
+{% if messages %}
+<div class="messages">
+    {% for message in messages %}
+    <div class="message">
+        {{ message }}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<form method="post" action="{% url 'create_post' %}" enctype="multipart/form-data" class="create-post-form">
+    {% csrf_token %}
+
+    <div class="form-section">
+        <div>
+            <label for="{{ form.title.id_for_label }}"><span style="color: red">*</span>{{ form.title.label }}</label>
+            {{ form.title }}
+            {% if form.title.errors %}
+            <div class="form-error">{{ form.title.errors }}</div>
+            {% endif %}
+        </div>
+
+        <div>
+            <label for="{{ form.description.id_for_label }}"><span style="color: red">*</span>Description</label>
+            {{ form.description }}
+            {% if form.description.errors %}
+            <div class="form-error">{{ form.description.errors }}</div>
+            {% endif %}
+        </div>
+
+        <div>
+            <label for="{{ form.location.id_for_label }}"><span style="color: red">*</span>Location</label>
+            {{ form.location }}
+            {% if form.location.errors %}
+            <div class="form-error">{{ form.location.errors }}</div>
+            {% endif %}
+        </div>
+
+        <div class="form-row">
             <div>
-                {% for message in messages %}
-                    <div>
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            </div>
-        {% endif %}
-
-        <form class = "post-form-group" method="post" action="{% url 'create_post' %}" enctype="multipart/form-data">
-            {% csrf_token %}
-            
-            <div class = "description-fields">
-                <div class = "label-and-input">
-                    <div>
-                        <span style="color: red">*</span><label for="{{ form.title.id_for_label }}">{{ form.title.label }}</label>
-                    </div>
-                    {{ form.title }}
-                    {% if form.title.errors %}
-                        {{ form.title.errors }}
-                    {% endif %}
-                </div>
-                
-
-                <div class = "label-and-input">
-                    <div>
-                        <label for="{{ form.description.id_for_label }}">{{ form.description.label }}</label>
-                    </div>
-                    {{ form.description }}
-                    {% if form.description.errors %}
-                        {{ form.description.errors }}
-                    {% endif %}
-                </div>
-
-                <div class = "label-and-input">
-                    <div>
-                        <span style="color: red">* </span><label for="{{ form.location.id_for_label }}">{{ form.location.label }}</label>
-                    </div>
-                    {{ form.location }}
-                    {% if form.location.errors %}
-                        {{ form.location.errors }}
-                    {% endif %}
-                </div>
-                
-            </div>
-
-            <div class = "time-fields">
-                <div>
-                    <div>
-                        <span style="color: red">* </span><label for="{{ form.start_time.id_for_label }}">{{ form.start_time.label }}</label>
-                    </div>
-                    {{ form.start_time }}
-                    {% if form.start_time.errors %}
-                        {{ form.start_time.errors }}
-                    {% endif %}
-                </div>
-
-                <div>
-                    <div>
-                        <span style="color: red">* </span><label for="{{ form.end_time.id_for_label }}">{{ form.end_time.label }}</label>
-                    </div>
-                    {{ form.end_time }}
-                    {% if form.end_time.errors %}
-                        {{ form.end_time.errors }}
-                    {% endif %}
-                </div>
-            </div>
-            
-            <h2>Tags</h2>
-            <div class = "tags-field">
-                <!-- <label>{{ form.tags.label }}</label> -->
-                {{ form.tags }}
-                {% if form.end_time.errors %}
-                    {{ form.end_time.errors }}
+                <label for="{{ form.start_time.id_for_label }}"><span style="color: red">*</span>Start Time</label>
+                {{ form.start_time }}
+                {% if form.start_time.errors %}
+                <div class="form-error">{{ form.start_time.errors }}</div>
                 {% endif %}
             </div>
-            
-            <h2>Images</h2>
-            <div id="image-forms">
-                {{ formset.management_form }}
-                {% for image_form in formset %}
-                    <div class="image-form">
-                        <h3>Image {{ forloop.counter }}</h3>
-                        <img class="image-preview">
-                        {{ image_form.as_p }}
-                        {% if image_form.can_delete %}
-                            <button type="button" class="remove-image">Remove</button>
-                        {% endif %}
-                    </div>
-                {% endfor %}
-            </div>
 
-            <!-- Hidden empty form template -->
-            <div id="empty-form" style="display:none;">
-                <div class="image-form">
-                    <h3>Image </h3>
-                    <img class="image-preview">
-                    {{ formset.empty_form.as_p }}
-                    <button type="button" class="remove-image">Remove</button>
+            <div>
+                <label for="{{ form.end_time.id_for_label }}"><span style="color: red">*</span>End Time</label>
+                {{ form.end_time }}
+                {% if form.end_time.errors %}
+                <div class="form-error">{{ form.end_time.errors }}</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div>
+            <label for="{{ form.tags.id_for_label }}">{{ form.tags.label }}</label>
+            {{ form.tags }}
+            {% if form.tags.errors %}
+            <div class="form-error">{{ form.tags.errors }}</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="form-section">
+        <h2 class="form-section-title">Images</h2>
+        <div class="image-formset" id="image-formset">
+            {{ formset.management_form }}
+            {% for image_form in formset %}
+            <div class="image-form-item {% if not forloop.first %}hidden{% endif %}"
+                data-form-index="{{ forloop.counter0 }}">
+                <h3>Image {{ forloop.counter }}</h3>
+
+                <div class="file-input-wrapper">
+                    {# Render the file input with original id/name to keep backend intact #}
+                    {{ image_form.image }}
+                    {# A themed label acts as the button to open file picker #}
+                    <label class="file-input-label" for="{{ image_form.image.id_for_label }}">Choose Image</label>
+                    <span class="file-name" data-file-name> No file chosen </span>
+                    <button type="button" class="remove-image-btn" data-remove>Remove</button>
+                </div>
+
+                <div class="caption-wrapper hidden" data-caption-wrapper style="margin-top: 0.75rem;">
+                    <label for="{{ image_form.caption.id_for_label }}">Caption (optional)</label>
+                    {{ image_form.caption }}
                 </div>
             </div>
-            
-
-            <button type="button" id="add-image">Add Another Image</button>
-
-            
-            <div class = "footer-buttons">
-                <button type="submit">Create Post</button>
-                <a class= "cancel" href="{% url 'dashboard' %}">Cancel</a>
-            </div>
-        </form>
+            {% endfor %}
+            <button type="button" id="add-image-btn" class="add-image-btn hidden">+ Add Another Image</button>
+        </div>
     </div>
-{% endblock content %}
-{%block extra_js%}
+
+    {% if form.non_field_errors %}
+    <div class="form-error">
+        {{ form.non_field_errors }}
+    </div>
+    {% endif %}
+
+    <div class="form-actions">
+        <button type="submit">Create Post</button>
+    </div>
+</form>
+{%endblock content %}
+
+{% block extra_js %}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
+        const formsetEl = document.getElementById('image-formset');
+        if (!formsetEl) return;
 
-    function attachPreviewListener(imageInput) {
-        imageInput.addEventListener('change', function (event) {
-            const file = event.target.files[0];
-            const preview = event.target.closest('.image-form').querySelector('.image-preview');
+        const items = Array.from(formsetEl.querySelectorAll('.image-form-item'));
+        const addBtn = document.getElementById('add-image-btn');
+        const totalFormsInput = formsetEl.querySelector('input[name$="-TOTAL_FORMS"]');
 
-            if (file) {
-                preview.style.display = 'block';
-                preview.src = URL.createObjectURL(file);
-            } else {
-                preview.style.display = 'none';
-                preview.src = '';
-            }
-        });
-    }
-
-    // Attach preview listeners to EXISTING formset inputs
-    document.querySelectorAll('.form-image-input').forEach(attachPreviewListener);
-
-    let imageCount = 2;
-    const addImageButton = document.getElementById('add-image');
-    const imageFormsContainer = document.getElementById('image-forms');
-    const totalForms = document.querySelector('input[name$="-TOTAL_FORMS"]');  // ✅ more robust
-    const emptyForm = document.getElementById('empty-form').innerHTML;
-
-    addImageButton.addEventListener('click', function() {
-        const formCount = parseInt(totalForms.value);
-        const newFormHTML = emptyForm.replace(/__prefix__/g, formCount);
-        imageFormsContainer.insertAdjacentHTML('beforeend', newFormHTML);
-        totalForms.value = formCount + 1;
-        document.getElementsByTagName('h3')[imageCount - 1].innerText = 'Image ' + imageCount;
-        imageCount++;
-        const newInput = imageFormsContainer
-            .querySelectorAll('.image-form')[formCount]
-            .querySelector('.form-image-input');
-
-        attachPreviewListener(newInput);
-    });
-
-    imageFormsContainer.addEventListener('click', function(e) {
-        if (e.target.classList.contains('remove-image')) {
-            e.target.closest('.image-form').remove();
-            const formCount = imageFormsContainer.querySelectorAll('.image-form').length;
-            totalForms.value = formCount;
-            imageCount--;
-            // Update image numbers
-            const headers = imageFormsContainer.querySelectorAll('h3'); 
-            headers.forEach((header, index) => {
-                header.innerText = 'Image ' + (index + 1);
+        function anyFileSelected() {
+            return items.some(item => {
+                const input = item.querySelector('input[type="file"]');
+                return input && input.files && input.files.length > 0;
             });
         }
+
+        function syncAddButtonVisibility() {
+            const hiddenExists = items.some(item => item.classList.contains('hidden'));
+            if (anyFileSelected() && hiddenExists) {
+                addBtn.classList.remove('hidden');
+            } else {
+                addBtn.classList.add('hidden');
+            }
+        }
+
+        function ensureAtLeastOneVisible() {
+            const visibleCount = items.filter(i => !i.classList.contains('hidden')).length;
+            if (visibleCount === 0 && items.length > 0) {
+                items[0].classList.remove('hidden');
+            }
+        }
+
+        function updateFileNameDisplay(item) {
+            const input = item.querySelector('input[type="file"]');
+            const nameEl = item.querySelector('[data-file-name]');
+            const captionWrapper = item.querySelector('[data-caption-wrapper]');
+            if (!input || !nameEl) return;
+            if (input.files && input.files.length > 0) {
+                nameEl.textContent = input.files[0].name;
+                if (captionWrapper) captionWrapper.classList.remove('hidden');
+            } else {
+                nameEl.textContent = ' No file chosen ';
+                if (captionWrapper) captionWrapper.classList.add('hidden');
+            }
+        }
+
+        const anySelectedInitially = anyFileSelected();
+        items.forEach((item, idx) => {
+            const input = item.querySelector('input[type="file"]');
+            updateFileNameDisplay(item);
+            if (!anySelectedInitially) {
+                if (idx === 0) {
+                    item.classList.remove('hidden');
+                } else {
+                    item.classList.add('hidden');
+                }
+            } else {
+                if (input && input.files && input.files.length > 0) {
+                    item.classList.remove('hidden');
+                } else {
+                    item.classList.add('hidden');
+                }
+            }
+        });
+
+        syncAddButtonVisibility();
+
+        items.forEach((item, idx) => {
+            const fileInput = item.querySelector('input[type="file"]');
+            const removeBtn = item.querySelector('[data-remove]');
+
+            if (fileInput) {
+                fileInput.addEventListener('change', () => {
+                    updateFileNameDisplay(item);
+                    syncAddButtonVisibility();
+                });
+            }
+
+            if (removeBtn) {
+                removeBtn.addEventListener('click', () => {
+                    if (fileInput) {
+                        fileInput.value = '';
+                    }
+                    const captionInput = item.querySelector('input[type="text"]');
+                    if (captionInput) captionInput.value = '';
+                    updateFileNameDisplay(item);
+
+                    if (idx > 0) {
+                        item.classList.add('hidden');
+                    }
+                    ensureAtLeastOneVisible();
+                    syncAddButtonVisibility();
+                });
+            }
+        });
+
+        if (addBtn) {
+            addBtn.addEventListener('click', () => {
+                const nextHidden = items.find(i => i.classList.contains('hidden'));
+                if (nextHidden) {
+                    nextHidden.classList.remove('hidden');
+                    const anyHiddenLeft = items.some(i => i.classList.contains('hidden'));
+                    if (!anyHiddenLeft) addBtn.classList.add('hidden');
+                }
+            });
+        }
+
     });
-});
-
 </script>
-
-{% endblock extra_js%}
+{% endblock extra_js %}

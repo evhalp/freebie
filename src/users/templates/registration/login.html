@@ -1,22 +1,49 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/password-form.css' %}">
+{% endblock %}
 
 {% block content %}
-
     <h2>Login</h2>
-
-    <form method="post">
+    
+    {% if form.errors %}
+        <div class="form-errors">
+            {% if form.non_field_errors %}
+                {% for error in form.non_field_errors %}
+                    <p class="error-message">{{ error }}</p>
+                {% endfor %}
+            {% else %}
+                <p class="error-message">Invalid username or password. Please try again.</p>
+            {% endif %}
+        </div>
+    {% endif %}
+    
+    <form method="post" class="password-change-form">
         {% csrf_token %}
+        <div>
+            <label for="id_username"><span style="color: red">*</span>Username:</label>
+            {{ form.username }}
+        </div>
 
-        {{ form.as_p }}
-        <input type="submit" value="Login" />
-        {% if next %}
-            <input type="hidden" name="next" value="{{ next }}">
-        {% endif %}
+        <div>
+            <label for="id_password"><span style="color: red">*</span>Password:</label>
+            {{ form.password }}
+        </div>
+
+        <input type="submit" value="Login">
     </form>
+    
+    <p>Don't have an account? <a href="{% url 'sign_up' %}">Sign up here</a></p>
 
-    <p>
-        <a href="{% url 'password_reset' %}">Forgot your password?</a>
-        <a href="{% url 'dashboard' %}">Back to dashboard</a>
-    </p>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const username = document.getElementById("id_username");
+        const password = document.getElementById("id_password");
 
+        if (username) username.placeholder = "Enter your username";
+        if (password) password.placeholder = "Enter your password";
+    });
+</script>
 {% endblock content %}

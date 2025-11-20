@@ -1,57 +1,200 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Freebie - Profile{% endblock title %}
+{% block title %}Freebie - {{ profile_user.username }}'s Profile{% endblock title %}
 
 {% block extra_css %}
-    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+    <link rel="stylesheet" href="{% static 'css/user-profile.css' %}">
 {% endblock extra_css%}
 
 {% block content %}
 
-    <h1>{{ profile_user.username }}'s Profile</h1>
-    
+<div class="profile-container">
+    <div class="profile-header">
+        <div class="profile-image-section">
+            {% if profile_user.userprofile.image and profile_user.userprofile.image.name %}
+                <img src="{{ profile_user.userprofile.image.url }}" alt="{{ profile_user.username }}" class="profile-image-large">
+            {% else %}
+                <img src="{% static 'default-profile.png' %}" alt="{{ profile_user.username }}" class="profile-image-large">
+            {% endif %}
+        </div>
+        <div class="profile-content">
+            <div class="profile-top-section">
+                <div class="profile-name-section">
+                    <h1 class="profile-username">{{ profile_user.username }}</h1>
+                    {% if profile_user.first_name or profile_user.last_name %}
+                        <p class="profile-fullname">{{ profile_user.first_name }} {{ profile_user.last_name }}</p>
+                    {% endif %}
+                </div>
+                <div class="profile-stats">
+                    <div class="stat-item">
+                        <span class="stat-number">{{ profile_user.userprofile.credibility }}</span>
+                        <span class="stat-label">Credibility</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">{{ profile_user.userprofile.followers.count }}</span>
+                        <span class="stat-label">Followers</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">{{ profile_user.userprofile.following.count }}</span>
+                        <span class="stat-label">Following</span>
+                    </div>
+                </div>
+            </div>
+            <p class="bio-text">{{ profile_user.userprofile.bio|default:"No bio provided" }}</p>
+            <div class="profile-dates">
+                <span class="date-text">Joined {{ profile_user.userprofile.created_at|date:"F Y" }}</span>
+                <span class="date-separator">•</span>
+                <span class="date-text">Updated {{ profile_user.userprofile.updated_at|date:"M d, Y" }}</span>
+            </div>
+        </div>
+    </div>
+
     {% if user == profile_user %}
-        <div>
-            <h2> Account Information </h2>
-            <p><strong>Username:</strong> {{ user.username }}</p>
-            <p><strong>First Name:</strong> {{ user.first_name }}</p>
-            <p><strong>Last Name:</strong> {{ user.last_name }}</p>
-            <p><strong>Email:</strong> {{ user.email }}</p>
-            <p><strong>Date Joined:</strong> {{ user.date_joined|date:"F d, Y" }}</p>
-            <p><strong>Last Login:</strong> {{ user.last_login|date:"F d, Y g:i A" }}</p>
+        <div class="profile-section">
+            <h2 class="section-title">Edit Profile</h2>
+            <form method="post" enctype="multipart/form-data" class="edit-profile-form">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label>Profile Image</label>
+                    {% if profile_user.userprofile.image and profile_user.userprofile.image.name %}
+                        <div class="current-image">
+                            <img src="{{ profile_user.userprofile.image.url }}" alt="Current Profile Image" id="profile-image-preview">
+                        </div>
+                        <div id="current-image-display">
+                            <div id="current-file-info">
+                                <span>Currently: </span>
+                                <span id="image-path-text">{{ profile_user.userprofile.image.name }}</span>
+                            </div>
+                            <div id="image-upload-section" style="display: none;">
+                                <span>Currently: </span>
+                                <input type="file" name="image" accept="image/*" id="id_image" style="display: inline-block;">
+                            </div>
+                            <button type="button" class="remove-image-btn" id="clear-image-btn">Remove</button>
+                        </div>
+                        <input type="checkbox" name="image-clear" id="image-clear-checkbox" style="display: none;">
+                    {% else %}
+                        <input type="file" name="image" accept="image/*" id="id_image">
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    <label>Bio</label>
+                    {{ form.bio }}
+                </div>
+                <button type="submit" class="submit-btn">Update Profile</button>
+            </form>
         </div>
     {% endif %}
 
-    <div>
-        <h2> Profile Information </h2>
-        {% if user == profile_user %}
-            <form method="post" enctype="multipart/form-data">
-                {% csrf_token %}
-                <p><strong>Profile Image:</strong></p>
-                {% if profile_user.userprofile.image %}
-                    <img src="{{ profile_user.userprofile.image.url }}" alt="Profile Image" width="200">
-                    <br>
+    {% if user == profile_user %}
+        <div class="profile-section">
+            <h2 class="section-title">Account Settings</h2>
+            <div class="settings-content">
+                <div class="setting-group">
+                    <div class="email-setting" id="email-display-section">
+                        <div class="setting-row">
+                            <span class="setting-label">Email:</span>
+                            <span class="setting-value" id="email-display">{{ user.email }}</span>
+                        </div>
+                        <button class="small-setting-btn" id="change-email-btn">Change Email</button>
+                    </div>
+                    <div class="email-form" id="email-form" style="display: none;">
+                        <form method="post" action="{% url 'change_email' %}" class="inline-form">
+                            {% csrf_token %}
+                            <div class="form-row">
+                                <input type="email" name="new_email" placeholder="New email address" required class="email-input">
+                                <input type="email" name="confirm_email" placeholder="Confirm email address" required class="email-input">
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="small-setting-btn">Save</button>
+                                <button type="button" class="cancel-btn" id="cancel-email-btn">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+                    {% if messages %}
+                        {% for message in messages %}
+                            {% if 'email' in message.tags %}
+                                <div class="message-box {% if message.level == 25 %}success{% else %}error{% endif %}">
+                                    {{ message }}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                <div class="setting-group">
+                    <a href="{% url 'password_change' %}" class="setting-btn">Change Password</a>
+                </div>
+            </div>
+        </div>
+        <!-- Totally not ChatGPTed Javascript -->
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                {% if messages %}
+                    {% for message in messages %}
+                        {% if 'email' in message.tags and message.level != 25 %}
+                            document.getElementById('email-display-section').style.display = 'none';
+                            document.getElementById('email-form').style.display = 'block';
+                        {% endif %}
+                    {% endfor %}
                 {% endif %}
-                {{ form.image }}
-                <br><br>
-                <p><strong>Bio:</strong></p>
-                {{ form.bio }}
-                <br>
-                <button type="submit">Update Profile</button>
-            </form>
-        {% else %}
-            {% if profile_user.userprofile.image %}
-                <p><strong>Profile Image:</strong></p>
-                <img src="{{ profile_user.userprofile.image.url }}" alt="Profile Image" width="200">
-            {% endif %}
-            <p><strong>Bio:</strong> {{ profile_user.userprofile.bio|default:"No bio provided" }}</p>
-        {% endif %}
-        <p><strong>Credibility:</strong> {{ profile_user.userprofile.credibility }}</p>
-        <p><strong>Followers:</strong> {{ profile_user.userprofile.followers.count }}</p>
-        <p><strong>Following:</strong> {{ profile_user.userprofile.following.count }}</p>
-        <p><strong>Profile Created:</strong> {{ profile_user.userprofile.created_at|date:"F d, Y" }}</p>
-        <p><strong>Last Updated:</strong> {{ profile_user.userprofile.updated_at|date:"F d, Y g:i A" }}</p>
-    </div>
+                
+                document.getElementById('change-email-btn').addEventListener('click', function() {
+                    document.getElementById('email-display-section').style.display = 'none';
+                    document.getElementById('email-form').style.display = 'block';
+                });
+                
+                document.getElementById('cancel-email-btn').addEventListener('click', function() {
+                    document.getElementById('email-display-section').style.display = 'flex';
+                    document.getElementById('email-form').style.display = 'none';
+                });
+            });
+        </script>
+        
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const clearBtn = document.getElementById('clear-image-btn');
+                const imageInput = document.getElementById('id_image');
+                const clearCheckbox = document.getElementById('image-clear-checkbox');
+                const currentFileInfo = document.getElementById('current-file-info');
+                const imageUploadSection = document.getElementById('image-upload-section');
+                
+                if (clearBtn) {
+                    clearBtn.addEventListener('click', function() {
+                        if (currentFileInfo && currentFileInfo.style.display !== 'none') {
+                            // Switch to upload mode
+                            currentFileInfo.style.display = 'none';
+                            imageUploadSection.style.display = 'flex';
+                            clearBtn.textContent = 'Cancel';
+                            clearBtn.classList.remove('remove-image-btn');
+                            clearBtn.classList.add('cancel-btn');
+                        } else {
+                            // Switch back to current file display
+                            currentFileInfo.style.display = 'flex';
+                            imageUploadSection.style.display = 'none';
+                            clearBtn.textContent = 'Remove';
+                            clearBtn.classList.remove('cancel-btn');
+                            clearBtn.classList.add('remove-image-btn');
+                            if (imageInput) {
+                                imageInput.value = '';
+                            }
+                            if (clearCheckbox) {
+                                clearCheckbox.checked = false;
+                            }
+                        }
+                    });
+                }
+                
+                // When a new file is selected, uncheck the clear checkbox
+                if (imageInput) {
+                    imageInput.addEventListener('change', function() {
+                        if (this.files && this.files.length > 0 && clearCheckbox) {
+                            clearCheckbox.checked = false;
+                        }
+                    });
+                }
+            });
+        </script>
+    {% endif %}
+</div>
 
 {% endblock content %}
