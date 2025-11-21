@@ -68,7 +68,9 @@
                 </div>
                 <span class="username-post">{{ author.username }}</span>
             </div>
-            {% if user.is_authenticated and user != author %}
+            {% if user.is_authenticated and user == author %}
+            <a href="{% url 'edit_post' post.id %}" class="follow-btn">Edit Post</a>
+            {% elif user.is_authenticated and user != author %}
             <form method="post" class="follow-form" style="margin-left:auto;">
                 {% csrf_token %}
                 <input type="hidden" name="follow_toggle" value="1">
@@ -96,7 +98,7 @@
 
         <div class="post-actions">
             <div class="action-group">
-                <form method="post" action="{% url 'post-like' post.id %}" class="like-form">
+                <form method="post" action="{% url 'like_post' post.id %}" class="like-form">
                     {% csrf_token %}
                     <button type="submit" class="action-btn like-btn {% if user_liked %}liked{% endif %}">
                         <i class="fa-solid fa-thumbs-up"></i>

@@ -1,58 +1,65 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from .models import Post, Reaction, PostImage
+from .models import Post, Reaction, PostImage, PostImage
 from .forms import PostCreationForm, PostImageFormSet
-from users.models import User, UserProfile
+from users.models import UserProfile
 
 @login_required
-def create_post_view(request):
-    if request.method == 'POST':
-        form = PostCreationForm(request.POST, request.FILES)
+def edit_post_view(request, id=None):
+
+    if id is not None:
+        post = get_object_or_404(Post, id=id)
+        if post.user != request.user:
+            print(post.user, request.user)
+            return redirect('posts', id=id)
+        is_editing = True
+    else:
         post = None
+        is_editing = False
+
+    if request.method == 'POST':
+        form = PostCreationForm(request.POST, request.FILES, instance=post)
+
         if form.is_valid():
             post = form.save(commit=False)
             post.user = request.user
             post.save()
             form.save_m2m()
-        else:
-            # If the main form is invalid, re-render with an empty image formset
-            formset = PostImageFormSet(request.POST, request.FILES, queryset=PostImage.objects.none())
-            context = {'form': form, 'formset': formset, 'user': request.user}
-            return render(request, 'posts/create_post.html', context)
 
-        # Bind the POSTed image forms to the newly created post instance
-        formset = PostImageFormSet(request.POST, request.FILES, instance=post)
-        # Debug: print request.FILES and formset form info to server console
-        print('DEBUG: request.FILES keys:', list(request.FILES.keys()))
-        print('DEBUG: total_forms:', formset.total_form_count())
-        formset_forms = list(formset.forms)
-        for i, f in enumerate(formset_forms):
-            try:
-                changed = f.has_changed()
-            except Exception:
-                changed = 'err'
-            print(f'DEBUG: form {i} has_changed={changed} errors={f.errors if f.errors else None}')
+            formset = PostImageFormSet(request.POST, request.FILES, instance=post)
+            if formset.is_valid():
+                formset.save()
 
-        if formset.is_valid():
-            # Let the formset save and attach images to `post`
-            saved_objs = formset.save()
-            print('DEBUG: saved objects count:', len(saved_objs))
             return redirect('posts', id=post.id)
         else:
-            # Provide detailed formset errors to help debugging/feedback
-            print('DEBUG: formset.errors:', formset.errors)
-            messages.error(request, 'Image form is invalid')
+            if is_editing:
+                formset = PostImageFormSet(request.POST, request.FILES, instance=post)
+            else:
+                formset = PostImageFormSet(request.POST, request.FILES, queryset=PostImage.objects.none())
+            context = {
+                'form': form, 
+                'formset': formset, 
+                'user': request.user, 
+                'post': post, 
+                'is_editing': is_editing
+            }
+            return render(request, 'posts/edit_post.html', context)
     else:
-        form = PostCreationForm()
-        formset = PostImageFormSet(queryset=PostImage.objects.none())
+        if is_editing:
+            form = PostCreationForm(instance=post)
+            formset = PostImageFormSet(instance=post)
+        else:
+            form = PostCreationForm()
+            formset = PostImageFormSet(queryset=PostImage.objects.none())    
 
     context = {
-        'form': form,
-        'formset': formset,
-        'user': request.user
+        'form': form, 
+        'formset': formset, 
+        'user': request.user, 
+        'post': post, 
+        'is_editing': is_editing
     }
-    return render(request, 'posts/create_post.html', context)
+    return render(request, 'posts/edit_post.html', context)
 
 def post_view(request, id):
 
@@ -77,10 +84,8 @@ def post_view(request, id):
             target_profile = profile
             if actor_profile.is_following(target_profile):
                 actor_profile.unfollow(target_profile)
-                messages.success(request, f"You unfollowed {post_author.username}.")
             else:
                 actor_profile.follow(target_profile)
-                messages.success(request, f"You followed {post_author.username}.")
             return redirect('posts', id=id)
 
     is_following = False
