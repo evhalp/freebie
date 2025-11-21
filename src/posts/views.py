@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from .models import Post, Reaction, PostImage, PostImage
+from django.contrib import messages
+from .models import Post, Reaction, PostImage
 from .forms import PostCreationForm, PostImageFormSet
 from users.models import UserProfile
 
@@ -84,8 +85,10 @@ def post_view(request, id):
             target_profile = profile
             if actor_profile.is_following(target_profile):
                 actor_profile.unfollow(target_profile)
+                messages.success(request, f"You unfollowed {post_author.username}.")
             else:
                 actor_profile.follow(target_profile)
+                messages.success(request, f"You followed {post_author.username}.")
             return redirect('posts', id=id)
 
     is_following = False
