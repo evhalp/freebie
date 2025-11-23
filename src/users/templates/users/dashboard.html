@@ -818,7 +818,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const dataEl = document.getElementById('attending-posts-data');
     if (!dataEl) return;
     
-    const attendingPosts = JSON.parse(dataEl.textContent).reverse();
+    // Use server-provided ordering (ordered by start_time in `users.views.dashboard`)
+    const attendingPosts = JSON.parse(dataEl.textContent);
 
     const viewport = document.querySelector('.attending-carousel-viewport');
     const prevBtn = document.getElementById('prev-attending-btn');
@@ -827,6 +828,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentIndex = 0;
     const cardWidth = 280;
     const gap = 20;
+    let isAnimating = false;
 
     function createCard(post, slotIndex) {
         const card = document.createElement('div');
@@ -900,17 +902,89 @@ document.addEventListener('DOMContentLoaded', () => {
         if (nextBtn) nextBtn.disabled = currentIndex + 3 >= attendingPosts.length;
     }
     
+    // Ensure viewport hides overflow during animations
+    if (viewport) viewport.style.overflow = 'hidden';
+
+    function animateShift(direction, onComplete) {
+        if (!viewport || isAnimating) return;
+        // Preload incoming card (to the right for 'left' navigation, to the left for 'right')
+        const incomingIndex = direction === 'left' ? currentIndex + 3 : currentIndex - 1;
+        const incomingSlot = direction === 'left' ? 3 : -1;
+        const incomingPost = attendingPosts[incomingIndex];
+        if (incomingPost) {
+            // Only add if not already present
+            if (!viewport.querySelector(`#attending-${incomingPost.id}`)) {
+                const incCard = createCard(incomingPost, incomingSlot);
+                // keep it positioned off to the side (absolute left based on slot)
+                if (direction === 'left') {
+                    viewport.appendChild(incCard);
+                } else {
+                    // insert at start so DOM order mirrors visual order
+                    viewport.insertBefore(incCard, viewport.firstChild);
+                }
+            }
+        }
+
+        const cards = Array.from(viewport.querySelectorAll('.attending-carousel-card'));
+        if (!cards.length) { if (onComplete) onComplete(); return; }
+        const shift = (cardWidth + gap) * (direction === 'left' ? -1 : 1);
+        isAnimating = true;
+
+        // Ensure every card starts with no inline transition and at translateX(0)
+        cards.forEach(c => {
+            c.style.transition = 'none';
+            c.style.transform = 'translateY(-50%) translateX(0)';
+            c.style.visibility = '';
+        });
+
+        // Force reflow so the browser registers the starting positions
+        // using the first card as a reflow trigger
+        if (cards[0]) void cards[0].getBoundingClientRect();
+
+        // Start the translate in the next frame so transition will animate
+        requestAnimationFrame(() => {
+            cards.forEach(c => {
+                c.style.transition = 'transform 300ms ease';
+                c.style.transform = `translateY(-50%) translateX(${shift}px)`;
+            });
+        });
+
+        const cleanup = () => {
+            // remove inline transform/transition so CSS rules apply again
+            cards.forEach(c => {
+                c.style.transition = '';
+                c.style.transform = '';
+            });
+            isAnimating = false;
+            if (typeof onComplete === 'function') onComplete();
+        };
+
+        // Wait for the last card to finish transition, fallback to timeout
+        const last = cards[cards.length - 1];
+        let fired = false;
+        const onEnd = (ev) => {
+            if (ev.target !== last) return;
+            if (fired) return;
+            fired = true;
+            last.removeEventListener('transitionend', onEnd);
+            cleanup();
+        };
+        last.addEventListener('transitionend', onEnd);
+        // fallback
+        setTimeout(() => { if (!fired) { fired = true; try { last.removeEventListener('transitionend', onEnd); } catch(_){} cleanup(); } }, 400);
+    }
+
     if (prevBtn) prevBtn.addEventListener('click', () => {
+        if (isAnimating) return;
         if (currentIndex > 0) {
-            currentIndex--;
-            renderCarousel('prev');
+            animateShift('right', () => { currentIndex = Math.max(0, currentIndex - 1); renderCarousel(); });
         }
     });
 
     if (nextBtn) nextBtn.addEventListener('click', () => {
+        if (isAnimating) return;
         if (currentIndex + 3 < attendingPosts.length) {
-            currentIndex++;
-            renderCarousel('next');
+            animateShift('left', () => { currentIndex = Math.min(attendingPosts.length - 3, currentIndex + 1); renderCarousel(); });
         }
     });
 
