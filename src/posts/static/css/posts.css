@@ -193,6 +193,8 @@
     cursor: pointer;
     transition: opacity 0.3s;
     font-weight: 500;
+    width: 110px;
+    text-align: center;
 }
 
 .follow-btn:hover {
@@ -253,9 +255,11 @@
 .action-btn {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 0.5rem;
     padding: 0.6rem 1rem;
     height: 40px;
+        width: 130px;
     border: 1px solid var(--primary-color);
     background: transparent;
     color: var(--primary-color);

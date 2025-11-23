@@ -5,9 +5,947 @@
 
 {% block extra_css %}
     <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+    <link rel="stylesheet" href="{% static 'css/search.css' %}">
 {% endblock extra_css%}
 
 {% block content %}
-    <!-- DASHBOARD CONTENT GOES HERE -->
-    <div class = "container">hey guys this is a dashboard and the content will go somewhere around here</div>
-{% endblock content %}
+{% if user.is_authenticated %}
+<div class="dashboard-container">
+    <div class="welcome-header">
+        <h1>Welcome back, {{ user.username }}!</h1>
+        <p class="welcome-text">Thank you for becoming a member of the Freebie community! Explore your dashboard to view, create, and <a href="{% url 'search' %}" class="welcome-link">search</a> for events!</p>
+    </div>
+
+    <div class="dashboard-grid">
+        <section class="dashboard-section my-posts-section">
+            <div class="section-header">
+                <h2>My Posts</h2>
+                <a href="{% url 'create_post' %}" class="create-post-btn btn-primary">Create New +</a>
+            </div>
+            <div class="event-grid">
+                {% if user_posts_page.object_list %}
+                    {% for post in user_posts_page.object_list %}
+                    <div class="event-card" id="{{ post.id }}">
+                        <div class="content">
+                            <div class="image-wrapper">
+                                {% if post.images.first and post.images.first.image and post.images.first.image.name %}
+                                    <img class="post-image" src="{{ post.images.first.image.url }}" alt="{{ post.images.first.caption|default:post.title }}">
+                                {% else %}
+                                    <img class="post-image" src="{{ MEDIA_URL }}default.png" alt="{{ post.title }}">
+                                {% endif %}
+                            </div>
+                            <h4 id="post-title" title="{{ post.title }}">{{ post.title }}</h4>
+                            {% if post.location %}
+                            <p class="post-location">
+                                <i class="fa-solid fa-location-dot"></i>{{ post.location }}
+                            </p>
+                            {% endif %}
+                            <p id="post-description">
+                                {% if post.description|length > 110 %}
+                                    {{ post.description|slice:":110" }}…
+                                {% else %}
+                                    {{ post.description }}
+                                {% endif %}
+                            </p>
+                            <div id="tags">
+                                {% if post.tags.all %}
+                                    {% for t in post.tags.all|slice:":3" %}
+                                        <span class="tag" title="{{ t.description }}" data-bg="{{ t.bg_color }}" data-text="{{ t.text_color }}">{{ t.name }}</span>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                            <div class="footer">
+                                <div id="post-date">{{ post.start_time|date:"F j, Y" }}</div>
+                                <div id="like-button">
+                                    <div id="icon"><i class="fa-solid fa-thumbs-up"></i></div>
+                                    Likes: {{ post.like_count|default:0 }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        <p>You haven't created any posts yet.</p>
+                        <a href="{% url 'create_post' %}" class="create-post-btn btn-primary">Create Your First Post</a>
+                    </div>
+                {% endif %}
+            </div>
+            
+            {% if user_posts_page.paginator.num_pages > 1 %}
+            <div class="my-posts-paginator">
+                <button class="btn-secondary pager-btn" id="prev-posts-btn" {% if not user_posts_page.has_previous %}disabled{% endif %}>‹ Prev</button>
+                <span class="pager-status">Page <span id="current-page">{{ user_posts_page.number }}</span> of {{ user_posts_page.paginator.num_pages }}</span>
+                <button class="btn-secondary pager-btn" id="next-posts-btn" {% if not user_posts_page.has_next %}disabled{% endif %}>Next ›</button>
+            </div>
+            {% endif %}
+        </section>
+
+        <section class="dashboard-section hot-events-section">
+            <div class="section-header">
+                <h2>🔥 Hot Event</h2>
+                <span class="section-subtitle">Popular Event Happening Now!!!</span>
+            </div>
+            <div class="event-grid single-hot-event">
+                {% if hot_event %}
+                <div class="event-card" id="{{ hot_event.id }}">
+                    <div class="content">
+                        <div class="image-wrapper">
+                            {% if hot_event.images.first and hot_event.images.first.image and hot_event.images.first.image.name %}
+                                <img class="post-image" src="{{ hot_event.images.first.image.url }}" alt="{{ hot_event.images.first.caption|default:hot_event.title }}">
+                            {% else %}
+                                <img class="post-image" src="{{ MEDIA_URL }}default.png" alt="{{ hot_event.title }}">
+                            {% endif %}
+                        </div>
+                        <h4 id="post-title" title="{{ hot_event.title }}">{{ hot_event.title }}</h4>
+                        {% if hot_event.location %}
+                        <p class="post-location"><i class="fa-solid fa-location-dot"></i>{{ hot_event.location }}</p>
+                        {% endif %}
+                        <p id="post-description">
+                            {% if hot_event.description|length > 110 %}
+                                {{ hot_event.description|slice:":110" }}…
+                            {% else %}
+                                {{ hot_event.description }}
+                            {% endif %}
+                        </p>
+                        <div id="tags">
+                            {% if hot_event.tags.all %}
+                                {% for t in hot_event.tags.all|slice:":3" %}
+                                    <span class="tag" title="{{ t.description }}" data-bg="{{ t.bg_color }}" data-text="{{ t.text_color }}">{{ t.name }}</span>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        <div class="footer">
+                            <div id="post-date">{{ hot_event.start_time|date:"F j, Y" }}</div>
+                            <div id="like-button">
+                                <div id="icon"><i class="fa-solid fa-thumbs-up"></i></div>
+                                Likes: {{ hot_event.like_count|default:0 }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="countdown-container">
+                    <div class="countdown-label">Time until event ends:</div>
+                    <span id="hot-event-countdown" data-end="{{ hot_event.end_time|date:'c' }}"></span>
+                </div>
+                <script>
+                function updateHotEventCountdown() {
+                    const countdown = document.getElementById('hot-event-countdown');
+                    if (!countdown) return;
+                    const endTimeStr = countdown.getAttribute('data-end');
+                    if (!endTimeStr) return;
+                    const endTime = new Date(endTimeStr);
+                    function pad(n) { return n < 10 ? '0' + n : n; }
+                    function renderCountdown() {
+                        const now = new Date();
+                        let diff = Math.floor((endTime - now) / 1000);
+                        if (diff < 0) {
+                            countdown.textContent = 'Event ended';
+                            return;
+                        }
+                        const days = Math.floor(diff / 86400);
+                        diff %= 86400;
+                        const hours = Math.floor(diff / 3600);
+                        diff %= 3600;
+                        const minutes = Math.floor(diff / 60);
+                        const seconds = diff % 60;
+                        countdown.textContent = `${days}d ${pad(hours)}h ${pad(minutes)}m ${pad(seconds)}s`;
+                    }
+                    renderCountdown();
+                    setInterval(renderCountdown, 1000);
+                }
+                document.addEventListener('DOMContentLoaded', updateHotEventCountdown);
+                </script>
+                {% else %}
+                <div class="empty-state">
+                    <p>No popular event happening right now.</p>
+                </div>
+                {% endif %}
+            </div>
+        </section>
+
+        <div class="dashboard-row">
+            <section class="dashboard-section following-section">
+            <div class="section-header">
+                <h2>Following</h2>
+                <span class="section-count">{{ following_users|length }}</span>
+            </div>
+            <div class="following-search-wrapper">
+                <input type="text" id="following-search" placeholder="Search following..." aria-label="Search followed users" />
+            </div>
+            <div id="following-no-results" style="display:none;" class="empty-state small">
+                <p>No matches found.</p>
+            </div>
+            <div class="following-list">
+                {% if following_users %}
+                    {% for profile in following_users %}
+                    <div class="following-card" data-username="{{ profile.user.username }}">
+                        <a href="{% url 'user_profile' profile.user.username %}" class="following-card-link">
+                            <div class="following-avatar">
+                                {% if profile.image %}
+                                    <img src="{{ profile.image.url }}" alt="{{ profile.user.username }}">
+                                {% else %}
+                                    <div class="avatar-placeholder">{{ profile.user.username|first|upper }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="following-info">
+                                {% with uname=profile.user.username %}
+                                <p class="following-username">{% if uname|length > 12 %}{{ uname|slice:":12" }}…{% else %}{{ uname }}{% endif %}</p>
+                                {% endwith %}
+                            </div>
+                        </a>
+                        <div class="following-stats">
+                            <div class="stat-item">
+                                <span class="stat-number">{{ profile.credibility }}</span>
+                                <span class="stat-label">Credibility</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number">{{ profile.followers.count }}</span>
+                                <span class="stat-label">Followers</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number">{{ profile.following.count }}</span>
+                                <span class="stat-label">Following</span>
+                            </div>
+                        </div>
+                        <button class="follow-btn toggle-follow-btn" data-username="{{ profile.user.username }}">Unfollow</button>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        <p>You're not following anyone yet.</p>
+                        <a href="{% url 'search' %}" class="create-post-btn" style="margin-top:0.75rem; display:inline-block;">Find Users</a>
+                    </div>
+                {% endif %}
+            </div>
+        </section>
+
+            <section class="dashboard-section feed-section">
+            <div class="section-header">
+                <h2>Feed from Following</h2>
+            </div>
+            <div class="feed-wrapper">
+                {% if following_feed %}
+                    <div class="feed-card-row">
+                        <div class="feed-card-viewport">
+                            {% with post=following_feed.0 %}
+                            <div class="event-card feed-card-a" id="feed-{{ post.id }}">
+                                <div class="content">
+                                    <div class="image-wrapper">
+                                        {% if post.images.first and post.images.first.image and post.images.first.image.name %}
+                                            <img class="post-image" src="{{ post.images.first.image.url }}" alt="{{ post.images.first.caption|default:post.title }}">
+                                        {% else %}
+                                            <img class="post-image" src="{{ MEDIA_URL }}default.png" alt="{{ post.title }}">
+                                        {% endif %}
+                                    </div>
+                                    <h4 id="post-title" title="{{ post.title }}">{{ post.title }}</h4>
+                                    {% if post.location %}
+                                    <p class="post-location"><i class="fa-solid fa-location-dot"></i>{{ post.location }}</p>
+                                    {% endif %}
+                                    <p id="post-description">
+                                        {% if post.description|length > 110 %}
+                                            {{ post.description|slice:":110" }}…
+                                        {% else %}
+                                            {{ post.description }}
+                                        {% endif %}
+                                    </p>
+                                    <div id="tags">
+                                        {% if post.tags.all %}
+                                            {% for t in post.tags.all|slice:":3" %}
+                                                <span class="tag" title="{{ t.description }}" data-bg="{{ t.bg_color }}" data-text="{{ t.text_color }}">{{ t.name }}</span>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                    <div class="footer">
+                                        <div id="post-date">{{ post.start_time|date:"F j, Y" }}</div>
+                                        <div id="like-button">
+                                            <div id="icon"><i class="fa-solid fa-thumbs-up"></i></div>
+                                            Likes: <span class="like-count">{{ post.like_count|default:0 }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endwith %}
+                            <div class="event-card feed-card-b" style="visibility:hidden;">
+                                <div class="content">
+                                    <div class="image-wrapper">
+                                        <img class="post-image" src="" alt="">
+                                    </div>
+                                    <h4 id="post-title" title=""></h4>
+                                    <p class="post-location"></p>
+                                    <p id="post-description"></p>
+                                    <div id="tags"></div>
+                                    <div class="footer">
+                                        <div id="post-date"></div>
+                                        <div id="like-button"><div id="icon"><i class="fa-solid fa-thumbs-up"></i></div> Likes: <span class="like-count">0</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="feed-vertical-paginator" aria-label="Feed navigation">
+                            <button class="btn-secondary pager-btn" id="prev-feed-btn" title="Previous post"><i class="fa-solid fa-chevron-up"></i></button>
+                            <button class="btn-secondary pager-btn" id="next-feed-btn" title="Next post"><i class="fa-solid fa-chevron-down"></i></button>
+                        </div>
+                    </div>
+                    <div class="feed-author" id="feed-author">
+                        <span class="feed-posted-by">Posted by:</span>
+                        {% with post=following_feed.0 %}
+                        <a href="{% url 'user_profile' post.user.username %}" class="feed-author-link">
+                            {% if post.user.userprofile.image %}
+                                <img src="{{ post.user.userprofile.image.url }}" alt="{{ post.user.username }}" class="feed-author-avatar">
+                            {% else %}
+                                <div class="feed-author-placeholder">{{ post.user.username|first|upper }}</div>
+                            {% endif %}
+                            <span class="feed-author-name">{{ post.user.username }}</span>
+                        </a>
+                        <span class="feed-time-ago" id="feed-time-ago" data-created="{{ post.created_at|date:'c' }}"></span>
+                        {% endwith %}
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <p>No posts from people you follow yet.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </section>
+
+        </div>
+        <section class="dashboard-section attending-section">
+            <div class="section-header">
+                <h2>My Attending</h2>
+            </div>
+            {% if attending_posts %}
+            <div class="attending-carousel-container">
+                <div class="attending-carousel-viewport">
+                    {% for post in attending_posts|slice:":3" %}
+                    <div class="event-card attending-carousel-card" id="attending-{{ post.id }}" data-post-id="{{ post.id }}" data-index="{{ forloop.counter0 }}">
+                        <div class="content">
+                            <div class="image-wrapper">
+                                {% if post.images.first and post.images.first.image and post.images.first.image.name %}
+                                    <img class="post-image" src="{{ post.images.first.image.url }}" alt="{{ post.images.first.caption|default:post.title }}">
+                                {% else %}
+                                    <img class="post-image" src="{{ MEDIA_URL }}default.png" alt="{{ post.title }}">
+                                {% endif %}
+                            </div>
+                            <h4 id="post-title" title="{{ post.title }}">{{ post.title }}</h4>
+                            {% if post.location %}
+                            <p class="post-location"><i class="fa-solid fa-location-dot"></i>{{ post.location }}</p>
+                            {% endif %}
+                            <p id="post-description">
+                                {% if post.description|length > 110 %}
+                                    {{ post.description|slice:":110" }}…
+                                {% else %}
+                                    {{ post.description }}
+                                {% endif %}
+                            </p>
+                            <div id="tags">
+                                {% if post.tags.all %}
+                                    {% for t in post.tags.all|slice:":3" %}
+                                        <span class="tag" title="{{ t.description }}" data-bg="{{ t.bg_color }}" data-text="{{ t.text_color }}">{{ t.name }}</span>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                            <div class="footer">
+                                <div id="post-date">{{ post.start_time|date:"F j, Y" }}</div>
+                                <div id="like-button">
+                                    <div id="icon"><i class="fa-solid fa-thumbs-up"></i></div>
+                                    Likes: <span class="like-count">{{ post.like_count|default:0 }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% if attending_posts|length > 3 %}
+            <div class="attending-paginator">
+                <button class="btn-secondary pager-btn" id="prev-attending-btn" disabled>‹ Prev</button>
+                <button class="btn-secondary pager-btn" id="next-attending-btn">Next ›</button>
+            </div>
+            {% endif %}
+            <script type="application/json" id="attending-posts-data">{{ attending_data_json|safe }}</script>
+            {% else %}
+            <div class="empty-state">
+                <p>You haven't marked any events as attending yet.</p>
+                <a href="{% url 'search' %}" class="create-post-btn" style="margin-top:0.75rem; display:inline-block;">Find Events</a>
+            </div>
+            {% endif %}
+        </section>
+
+    </div>
+</div>
+{% else %}
+<div class="dashboard-container">
+    <section class="dashboard-section guest-dashboard" style="min-height:420px;display:flex;align-items:center;justify-content:center;">
+        <div class="empty-state" style="max-width:560px;">
+            <h2 style="margin-top:0;">Welcome to Freebie!</h2>
+            <p>Create an account to follow users, discover events, mark attendance, and build your feed.</p>
+            <div style="display:flex;gap:0.75rem;flex-wrap:wrap;justify-content:center;">
+                <a href="{% url 'sign_up' %}" class="create-post-btn" style="min-width:160px;">Sign Up</a>
+                <a href="{% url 'login' %}" class="create-post-btn" style="min-width:160px;">Log In</a>
+            </div>
+        </div>
+    </section>
+</div>
+{% endif %}
+<script>
+
+document.addEventListener('DOMContentLoaded', () => {
+    const myPostCards = document.querySelectorAll('.my-posts-section .event-card');
+    myPostCards.forEach(card => {
+        card.addEventListener('click', () => {
+            window.location.assign('/posts/' + card.id);
+        });
+    });
+
+    document.querySelectorAll('.hot-events-section .event-card').forEach(card => {
+        card.addEventListener('click', () => {
+            window.location.assign('/posts/' + card.id);
+        });
+    });
+
+    document.querySelectorAll('.my-posts-section .tag').forEach(tag => {
+        if(tag.dataset.bg) tag.style.backgroundColor = tag.dataset.bg;
+        if(tag.dataset.text) tag.style.color = tag.dataset.text;
+    });
+
+    document.querySelectorAll('.hot-events-section .tag').forEach(tag => {
+        if(tag.dataset.bg) tag.style.backgroundColor = tag.dataset.bg;
+        if(tag.dataset.text) tag.style.color = tag.dataset.text;
+    });
+
+    const prevBtn = document.getElementById('prev-posts-btn');
+    const nextBtn = document.getElementById('next-posts-btn');
+    const currentPageSpan = document.getElementById('current-page');
+    const postsGrid = document.querySelector('.my-posts-section .event-grid');
+    
+    if (prevBtn && nextBtn && postsGrid) {
+        const urlParams = new URLSearchParams(window.location.search);
+        let currentPage = parseInt(urlParams.get('posts_page') || '1');
+        const totalPages = parseInt('{{ user_posts_page.paginator.num_pages }}', 10);
+        let autoCycleInterval;
+        
+        async function loadPage(page) {
+            const url = new URL(window.location.href);
+            url.searchParams.set('posts_page', page);
+            
+            try {
+                const response = await fetch(url.toString());
+                const html = await response.text();
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                
+                const newGrid = doc.querySelector('.my-posts-section .event-grid');
+                if (newGrid) {
+                    postsGrid.style.opacity = '0';
+                    postsGrid.style.transition = 'opacity 0.3s ease-out';
+                    
+                    setTimeout(() => {
+                        postsGrid.innerHTML = newGrid.innerHTML;
+                        
+                        const myPostCards = document.querySelectorAll('.my-posts-section .event-card');
+                        myPostCards.forEach(card => {
+                            card.addEventListener('click', () => {
+                                window.location.assign('/posts/' + card.id);
+                            });
+                        });
+                        
+                        document.querySelectorAll('.my-posts-section .tag').forEach(tag => {
+                            if(tag.dataset.bg) tag.style.backgroundColor = tag.dataset.bg;
+                            if(tag.dataset.text) tag.style.color = tag.dataset.text;
+                        });
+                        
+                        setTimeout(() => {
+                            postsGrid.style.opacity = '1';
+                        }, 10);
+                    }, 300);
+                }
+                
+                currentPage = page;
+                currentPageSpan.textContent = page;
+                prevBtn.disabled = (page <= 1);
+                nextBtn.disabled = false;
+                
+                window.history.replaceState({}, '', url.toString());
+            } catch (error) {
+                console.error('Failed to load page:', error);
+            }
+        }
+        
+        prevBtn.addEventListener('click', () => {
+            if (currentPage > 1) {
+                clearInterval(autoCycleInterval);
+                loadPage(currentPage - 1);
+            }
+        });
+        
+        nextBtn.addEventListener('click', () => {
+            clearInterval(autoCycleInterval);
+            const nextPage = currentPage < totalPages ? currentPage + 1 : 1;
+            loadPage(nextPage);
+        });
+        
+        if (totalPages > 1) {
+            autoCycleInterval = setInterval(() => {
+                const nextPage = currentPage < totalPages ? currentPage + 1 : 1;
+                loadPage(nextPage);
+            }, 5000);
+        }
+    }
+});
+</script>
+<script id="feed-posts-data" type="application/json">{{ feed_data_json|safe }}</script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    function formatTimeAgo(isoString) {
+        const now = new Date();
+        const created = new Date(isoString);
+        const diffMs = now - created;
+        const diffSecs = Math.floor(diffMs / 1000);
+        const diffMins = Math.floor(diffSecs / 60);
+        const diffHours = Math.floor(diffMins / 60);
+        const diffDays = Math.floor(diffHours / 24);
+        if (diffDays > 0) return diffDays + (diffDays === 1 ? ' day ago' : ' days ago');
+        if (diffHours > 0) return diffHours + (diffHours === 1 ? ' hour ago' : ' hours ago');
+        if (diffMins > 0) return diffMins + (diffMins === 1 ? ' minute ago' : ' minutes ago');
+        return 'just now';
+    }
+    const feedPosts = JSON.parse(document.getElementById('feed-posts-data').textContent);
+    let feedIndex = 0;
+    const viewport = document.querySelector('.feed-card-viewport');
+    const cardA = viewport ? viewport.querySelector('.feed-card-a') : null;
+    const cardB = viewport ? viewport.querySelector('.feed-card-b') : null;
+    let activeCard = cardA;
+    const feedAuthorBlock = document.getElementById('feed-author');
+    const prevBtn = document.getElementById('prev-feed-btn');
+    const nextBtn = document.getElementById('next-feed-btn');
+    const feedIndexSpan = document.getElementById('current-feed-index');
+
+    function fillCard(cardEl, post) {
+        if (!cardEl || !post) return;
+        cardEl.id = 'feed-' + post.id;
+        const titleEl = cardEl.querySelector('#post-title');
+        const locEl = cardEl.querySelector('.post-location');
+        const descEl = cardEl.querySelector('#post-description');
+        const imgEl = cardEl.querySelector('.post-image');
+        const dateEl = cardEl.querySelector('#post-date');
+        const likeEl = cardEl.querySelector('#like-button .like-count');
+        const tagsEl = cardEl.querySelector('#tags');
+        if (titleEl) titleEl.textContent = post.title;
+        if (locEl) locEl.innerHTML = post.location ? `<i class=\"fa-solid fa-location-dot\"></i>${post.location}` : '';
+        if (descEl) descEl.textContent = post.description.length > 110 ? post.description.slice(0,110) + '…' : post.description;
+        if (imgEl) imgEl.src = post.image;
+        if (dateEl) dateEl.textContent = post.date;
+        if (likeEl) likeEl.textContent = post.like_count;
+        const likeBtn = cardEl.querySelector('#like-button');
+        if (likeBtn) likeBtn.classList.toggle('liked', !!post.user_liked);
+        if (tagsEl) {
+            tagsEl.innerHTML = '';
+            post.tags.forEach(tag => {
+                const span = document.createElement('span');
+                span.className = 'tag';
+                span.textContent = tag.name;
+                if (tag.bg) span.style.backgroundColor = tag.bg;
+                if (tag.text) span.style.color = tag.text;
+                tagsEl.appendChild(span);
+            });
+        }
+        cardEl.onclick = () => window.location.assign(post.url);
+    }
+
+    function updateAuthor(post) {
+        if (!feedAuthorBlock || !post) return;
+        feedAuthorBlock.innerHTML = '';
+        const postedBy = document.createElement('span');
+        postedBy.className = 'feed-posted-by';
+        postedBy.textContent = 'Posted by:';
+        feedAuthorBlock.appendChild(postedBy);
+        const link = document.createElement('a');
+        link.href = post.author_url;
+        link.className = 'feed-author-link';
+        if (post.author_image) {
+            const img = document.createElement('img');
+            img.src = post.author_image;
+            img.alt = post.author_username;
+            img.className = 'feed-author-avatar';
+            link.appendChild(img);
+        }
+        const nameSpan = document.createElement('span');
+        nameSpan.className = 'feed-author-name';
+        nameSpan.textContent = post.author_username;
+        link.appendChild(nameSpan);
+        feedAuthorBlock.appendChild(link);
+        const timeAgo = document.createElement('span');
+        timeAgo.className = 'feed-time-ago';
+        timeAgo.textContent = formatTimeAgo(post.created_at);
+        feedAuthorBlock.appendChild(timeAgo);
+    }
+
+    function slideTo(nextIndex, direction) {
+        if (!viewport || !cardA || !cardB) return;
+        const current = activeCard;
+        const incoming = activeCard === cardA ? cardB : cardA;
+        const post = feedPosts[nextIndex];
+        if (!post) return;
+        fillCard(incoming, post);
+        incoming.style.visibility = 'visible';
+        incoming.style.transition = 'none';
+        current.style.transition = 'none';
+        incoming.style.transform = direction === 'down' ? 'translateY(100%)' : 'translateY(-100%)';
+        current.style.transform = 'translateY(0)';
+        if (!viewport.style.height) {
+            viewport.style.height = current.getBoundingClientRect().height + 'px';
+        }
+        requestAnimationFrame(() => {
+            incoming.style.transition = 'transform 300ms ease';
+            current.style.transition = 'transform 300ms ease';
+            current.style.transform = direction === 'down' ? 'translateY(-100%)' : 'translateY(100%)';
+            incoming.style.transform = 'translateY(0)';
+            const onDone = () => {
+                current.style.transition = 'none';
+                incoming.style.transition = 'none';
+                current.style.transform = 'translateY(0)';
+                current.style.visibility = 'hidden';
+                activeCard = incoming;
+                updateAuthor(post);
+                current.removeEventListener('transitionend', onDone);
+            };
+            current.addEventListener('transitionend', onDone);
+        });
+    }
+    function updatePaginatorButtons() {
+        if (prevBtn) prevBtn.disabled = (feedIndex === 0);
+        if (nextBtn) nextBtn.disabled = (feedIndex === feedPosts.length - 1);
+    }
+    if (prevBtn) prevBtn.addEventListener('click', () => {
+        if (feedIndex > 0) {
+            const nextIndex = feedIndex - 1;
+            slideTo(nextIndex, 'up');
+            feedIndex = nextIndex;
+            updatePaginatorButtons();
+        }
+    });
+    if (nextBtn) nextBtn.addEventListener('click', () => {
+        if (feedIndex < feedPosts.length - 1) {
+            const nextIndex = feedIndex + 1;
+            slideTo(nextIndex, 'down');
+            feedIndex = nextIndex;
+            updatePaginatorButtons();
+        }
+    });
+    if (feedPosts.length > 0 && activeCard) {
+        fillCard(activeCard, feedPosts[0]);
+        updateAuthor(feedPosts[0]);
+        if (viewport && !viewport.style.height) {
+            viewport.style.height = activeCard.getBoundingClientRect().height + 'px';
+        }
+        updatePaginatorButtons();
+    }
+    document.querySelectorAll('.following-username').forEach(el => {
+        const txt = (el.textContent || '').trim();
+        if (txt.length > 12) el.textContent = txt.slice(0,12) + '…';
+    });
+
+});
+</script>
+</script>
+<script>
+function updateHotEventCountdown() {
+    const countdown = document.getElementById('hot-event-countdown');
+    if (!countdown) return;
+    const endTimeStr = countdown.getAttribute('data-end');
+    if (!endTimeStr) return;
+    const endTime = new Date(endTimeStr);
+    function pad(n) { return n < 10 ? '0' + n : n; }
+    function renderCountdown() {
+        const now = new Date();
+        let diff = Math.floor((endTime - now) / 1000);
+        if (diff < 0) {
+            countdown.textContent = 'Event ended';
+            return;
+        }
+        const days = Math.floor(diff / 86400);
+        diff %= 86400;
+        const hours = Math.floor(diff / 3600);
+        diff %= 3600;
+        const minutes = Math.floor(diff / 60);
+        const seconds = diff % 60;
+        countdown.textContent = `${days}d ${pad(hours)}h ${pad(minutes)}m ${pad(seconds)}s`;
+    }
+    renderCountdown();
+    setInterval(renderCountdown, 1000);
+}
+document.addEventListener('DOMContentLoaded', updateHotEventCountdown);
+</script>
+<script>
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const followToggleBtns = document.querySelectorAll('.toggle-follow-btn');
+    const searchInput = document.getElementById('following-search');
+    const noResults = document.getElementById('following-no-results');
+    const followingCards = Array.from(document.querySelectorAll('.following-card'));
+    const followingList = document.querySelector('.following-list');
+
+    function sizeFollowingList() {
+        if (!followingList) return;
+        const first = followingCards.find(c => c.offsetParent !== null);
+        if (!first) {
+            followingList.style.maxHeight = 'none';
+            return;
+        }
+        const cardRect = first.getBoundingClientRect();
+        const gapStr = getComputedStyle(followingList).gap || '12px';
+        const gapPx = parseFloat(gapStr);
+        const visibleCount = 5;
+        const maxH = (cardRect.height * visibleCount) + (gapPx * (visibleCount - 1));
+        followingList.style.maxHeight = Math.round(maxH) + 'px';
+        followingList.style.overflowY = 'auto';
+    }
+    sizeFollowingList();
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(sizeFollowingList, 120);
+    });
+    
+    function applyFollowingFilter() {
+        if (!searchInput) return;
+        const query = searchInput.value.trim().toLowerCase();
+        let visibleCount = 0;
+        followingCards.forEach(card => {
+            const username = card.dataset.username.toLowerCase();
+            const match = username.includes(query);
+            card.style.display = match ? '' : 'none';
+            if (match) visibleCount++;
+        });
+        if (query && visibleCount === 0) {
+            if (noResults) noResults.style.display = 'block';
+        } else {
+            if (noResults) noResults.style.display = 'none';
+        }
+    }
+    if (searchInput) {
+        searchInput.addEventListener('input', applyFollowingFilter);
+    }
+    
+    function showToast(message, type) {
+        const existing = document.getElementById('toast-message');
+        if (existing) existing.remove();
+        const toast = document.createElement('div');
+        toast.id = 'toast-message';
+        toast.className = 'toast-message ' + (type === 'success' ? 'toast-success' : 'toast-error');
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        setTimeout(() => {
+            toast.remove();
+        }, 3000); 
+    }
+    
+    followToggleBtns.forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const username = btn.dataset.username;
+            const card = btn.closest('.following-card');
+            
+            console.log('Follow toggle clicked for:', username);
+            
+            try {
+                const csrftoken = getCookie('csrftoken');
+                console.log('CSRF Token:', csrftoken);
+                console.log('Request URL:', `/toggle-follow/${username}/`);
+                
+                const response = await fetch(`/toggle-follow/${username}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrftoken,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                console.log('Response status:', response.status);
+                
+                const data = await response.json();
+                console.log('Response data:', data);
+                
+                if (response.ok) {
+                    if (data.is_following) {
+                        btn.textContent = 'Unfollow';
+                        showToast(`You followed ${username}`, 'success');
+                    } else {
+                        btn.textContent = 'Follow';
+                        showToast(`You unfollowed ${username}`, 'error');
+                    }
+                } else {
+                    console.error('Failed to toggle follow:', data.error || 'Unknown error');
+                    showToast('Action failed. Please try again.', 'error');
+                }
+            } catch (error) {
+                console.error('Error toggling follow:', error);
+                showToast('An error occurred. Please try again.', 'error');
+            }
+        });
+    });
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const dataEl = document.getElementById('attending-posts-data');
+    if (!dataEl) return;
+    
+    const attendingPosts = JSON.parse(dataEl.textContent).reverse();
+    if (attendingPosts.length <= 3) return; 
+    
+    const viewport = document.querySelector('.attending-carousel-viewport');
+    const prevBtn = document.getElementById('prev-attending-btn');
+    const nextBtn = document.getElementById('next-attending-btn');
+    
+    let currentIndex = 0;
+    const cardWidth = 280;
+    const gap = 20;
+    
+    function createCard(post, slotIndex) {
+        const card = document.createElement('div');
+        card.className = 'event-card attending-carousel-card';
+        card.id = `attending-${post.id}`;
+        card.dataset.postId = post.id;
+        card.style.left = `${slotIndex * (cardWidth + gap)}px`;
+        
+        const tagsHtml = post.tags.map(t => 
+            `<span class="tag" style="background-color:${t.bg};color:${t.text};">${t.name}</span>`
+        ).join('');
+        
+        const locationHtml = post.location ? 
+            `<p class="post-location"><i class="fa-solid fa-location-dot"></i>${post.location}</p>` : '';
+        
+        const descDisplay = post.description.length > 110 ? 
+            post.description.slice(0, 110) + '…' : post.description;
+        
+        card.innerHTML = `
+            <div class="content">
+                <div class="image-wrapper">
+                    <img class="post-image" src="${post.image}" alt="${post.title}">
+                </div>
+                <h4 id="post-title" title="${post.title}">${post.title}</h4>
+                ${locationHtml}
+                <p id="post-description">${descDisplay}</p>
+                <div id="tags">${tagsHtml}</div>
+                <div class="footer">
+                    <div id="post-date">${post.date}</div>
+                    <div id="like-button" class="${post.user_liked ? 'liked' : ''}">
+                        <div id="icon"><i class="fa-solid fa-thumbs-up"></i></div>
+                        Likes: <span class="like-count">${post.like_count}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        card.addEventListener('click', () => {
+            window.location.assign(post.url);
+        });
+        
+        return card;
+    }
+    
+    function getVisiblePosts() {
+        return [
+            attendingPosts[currentIndex],
+            attendingPosts[currentIndex + 1],
+            attendingPosts[currentIndex + 2]
+        ];
+    }
+    
+    function renderCarousel() {
+        viewport.innerHTML = '';
+        const visible = getVisiblePosts();
+        visible.forEach((post, slotIndex) => {
+            viewport.appendChild(createCard(post, slotIndex));
+        });
+        
+        prevBtn.disabled = currentIndex === 0;
+        nextBtn.disabled = currentIndex + 3 >= attendingPosts.length;
+    }
+    
+    prevBtn.addEventListener('click', () => {
+        if (currentIndex > 0) {
+            currentIndex--;
+            renderCarousel('prev');
+        }
+    });
+    
+    nextBtn.addEventListener('click', () => {
+        if (currentIndex + 3 < attendingPosts.length) {
+            currentIndex++;
+            renderCarousel('next');
+        }
+    });
+    
+    renderCarousel();
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
+
+    document.addEventListener('click', (e) => {
+        const likeButton = e.target.closest('#like-button');
+        if (!likeButton) return;
+        const card = likeButton.closest('.event-card');
+        if (!card) return;
+        e.preventDefault();
+        e.stopPropagation();
+        let postId = card.dataset.postId;
+        if (!postId) {
+            const match = card.id && card.id.match(/(\d+)/);
+            if (match) postId = match[1];
+        }
+        if (!postId) return;
+        fetch(`/posts/${postId}/like/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrftoken,
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        }).then(resp => resp.ok ? resp.json() : Promise.reject(resp.status))
+        .then(data => {
+            if (typeof data.like_count !== 'undefined') {
+                const countSpan = likeButton.querySelector('.like-count');
+                if (countSpan) countSpan.textContent = data.like_count;
+                likeButton.classList.toggle('liked', !!data.user_liked);
+            }
+        }).catch(err => {
+            console.error('Like toggle failed', err);
+        });
+    });
+});
+</script>
+{% endblock %}

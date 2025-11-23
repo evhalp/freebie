@@ -95,9 +95,9 @@
         <i class="fa-solid fa-location-dot"></i>{{ post.location }}
       </p>
       {% endif %}
-      <p id="post-description">
-        {% if post.description|length > 150 %}
-        {{ post.description|slice:":150" }}…
+      <p id="post-description" title="{{ post.description }}">
+        {% if post.description|length > 110 %}
+        {{ post.description|slice:":110" }}…
         {% else %}
         {{ post.description }}
         {% endif %}
@@ -131,23 +131,19 @@
 
 <!-- PAGINATION -->
 {% if paginator.num_pages > 1 %}
-<nav class="pagination">
-  <ul>
-    {% if page_obj.has_previous %}
-    <li><a href="?q={{ query }}&sort={{ sort }}&tag={{ tag }}&page={{ page_obj.previous_page_number }}">‹ Prev</a></li>
-    {% else %}
-    <li class="disabled"><span>‹ Prev</span></li>
-    {% endif %}
-
-    <li><span>Page {{ page_obj.number }} of {{ paginator.num_pages }}</span></li>
-
-    {% if page_obj.has_next %}
-    <li><a href="?q={{ query }}&sort={{ sort }}&tag={{ tag }}&page={{ page_obj.next_page_number }}">Next ›</a></li>
-    {% else %}
-    <li class="disabled"><span>Next ›</span></li>
-    {% endif %}
-  </ul>
-</nav>
+<div class="search-paginator">
+  {% if page_obj.has_previous %}
+    <a class="btn-secondary pager-btn" href="?q={{ query }}&sort={{ sort }}&tag={{ tag }}&page={{ page_obj.previous_page_number }}" aria-label="Previous page">‹ Prev</a>
+  {% else %}
+    <span class="btn-secondary pager-btn disabled" aria-disabled="true">‹ Prev</span>
+  {% endif %}
+  <span class="pager-status">Page {{ page_obj.number }} of {{ paginator.num_pages }}</span>
+  {% if page_obj.has_next %}
+    <a class="btn-secondary pager-btn" href="?q={{ query }}&sort={{ sort }}&tag={{ tag }}&page={{ page_obj.next_page_number }}" aria-label="Next page">Next ›</a>
+  {% else %}
+    <span class="btn-secondary pager-btn disabled" aria-disabled="true">Next ›</span>
+  {% endif %}
+</div>
 {% endif %}
 {% endblock content %}
 

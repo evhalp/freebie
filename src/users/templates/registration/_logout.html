@@ -1,5 +1,5 @@
-<form method="post" action="{% url 'logout' %}" class="logout-form">
+<form method="post" action="{% url 'logout' %}" class="logout-form" style="width:100%;margin:0;padding:0;">
     {% csrf_token %}
-    <input type="submit" value="Logout" />
+    <input type="submit" value="Logout" style="width:100%;box-sizing:border-box;" />
     <input type="hidden" name="next" value="{% url 'dashboard' %}" />
 </form>

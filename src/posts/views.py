@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import Post, Reaction, PostImage
@@ -57,7 +58,6 @@ def create_post_view(request):
 def post_view(request, id):
 
     """Loads Post information related to specified id"""
-    # --- Base queryset ---
     post = get_object_or_404(Post, id=id)
     post_author = post.user
     try:
@@ -65,7 +65,6 @@ def post_view(request, id):
     except UserProfile.DoesNotExist:
         profile = None
 
-    # like count and whether current user liked
     like_count = post.reactions.filter(sentiment='LIKE').count()
     user_liked = False
     if request.user.is_authenticated:
@@ -82,11 +81,19 @@ def post_view(request, id):
                 actor_profile.follow(target_profile)
                 messages.success(request, f"You followed {post_author.username}.")
             return redirect('posts', id=id)
+        if 'attend_toggle' in request.POST:
+            reaction, _ = Reaction.objects.get_or_create(post=post, user=request.user)
+            reaction.is_attending = not reaction.is_attending
+            reaction.save()
+            if reaction.is_attending:
+                messages.success(request, 'Marked as attending.')
+            else:
+                messages.success(request, 'Removed attending status.')
+            return redirect('posts', id=id)
 
     is_following = False
     if request.user.is_authenticated and request.user != post_author and profile:
         is_following = request.user.userprofile.is_following(profile)
-    # --- Context ---
     context = {
         'post': post,
         'author': post_author,
@@ -94,6 +101,7 @@ def post_view(request, id):
         'like_count': like_count,
         'user_liked': user_liked,
         'is_following': is_following,
+        'is_attending': Reaction.objects.filter(post=post, user=request.user, is_attending=True).exists() if request.user.is_authenticated else False,
     }
 
     return render(request, 'posts/posts.html', context)
@@ -101,30 +109,37 @@ def post_view(request, id):
 
 @login_required
 def toggle_like_view(request, id):
-    """Toggle a LIKE reaction for the logged-in user on the given post.
 
-    - If the user has no Reaction for the post, create one with sentiment='LIKE'.
-    - If the user has a Reaction with sentiment='LIKE', clear the sentiment (unlike).
-    - If the user has a Reaction with a different sentiment, set it to 'LIKE'.
-
-    Redirects back to the post detail page.
-    """
     if request.method != 'POST':
         return redirect('posts', id=id)
 
     post = get_object_or_404(Post, id=id)
-
     reaction, created = Reaction.objects.get_or_create(post=post, user=request.user)
 
     if created:
         reaction.sentiment = 'LIKE'
         reaction.save()
     else:
-        # toggle: if already LIKE -> remove sentiment; otherwise set to LIKE
         if reaction.sentiment == 'LIKE':
             reaction.sentiment = None
         else:
             reaction.sentiment = 'LIKE'
         reaction.save()
 
+    like_count = post.reactions.filter(sentiment='LIKE').count()
+    user_liked = post.reactions.filter(user=request.user, sentiment='LIKE').exists()
+
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return JsonResponse({'like_count': like_count, 'user_liked': user_liked})
+
     return redirect('posts', id=id)
+
+@login_required
+def toggle_attending_view(request, id):
+    if request.method != 'POST':
+        return redirect('posts', id=id)
+    post = get_object_or_404(Post, id=id)
+    reaction, _ = Reaction.objects.get_or_create(post=post, user=request.user)
+    reaction.is_attending = not reaction.is_attending
+    reaction.save()
+    return JsonResponse({'is_attending': reaction.is_attending})
