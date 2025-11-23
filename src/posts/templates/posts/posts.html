@@ -239,6 +239,14 @@
                     attendBtn.classList.toggle('going', data.is_attending);
                     attendBtn.querySelector('span').textContent = data.is_attending ? 'Attending' : "I'm going!";
                     showToast(data.is_attending ? 'Marked as attending.' : 'Removed attending status.', data.is_attending ? 'success' : 'error');
+                    // Notify other parts of the app (dashboard) so My Attending can update live
+                    try {
+                        const eventDetail = { is_attending: data.is_attending, post: data.post || null };
+                        document.dispatchEvent(new CustomEvent('attending:changed', { detail: eventDetail }));
+                    } catch (err) {
+                        // Not critical; continue silently
+                        console.warn('Could not dispatch attending:changed event', err);
+                    }
                 }
             } catch (err) {
                 showToast('Failed to update attending.', 'error');

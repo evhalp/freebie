@@ -594,7 +594,11 @@ document.addEventListener('DOMContentLoaded', () => {
         incoming.style.transform = direction === 'down' ? 'translateY(100%)' : 'translateY(-100%)';
         current.style.transform = 'translateY(0)';
         if (!viewport.style.height) {
-            viewport.style.height = current.getBoundingClientRect().height + 'px';
+            const vpStyle = getComputedStyle(viewport);
+            const cardStyle = getComputedStyle(current);
+            const topOffset = parseFloat(cardStyle.top) || current.offsetTop || 0;
+            const bottomPad = parseFloat(vpStyle.paddingBottom) || 0;
+            viewport.style.height = (current.getBoundingClientRect().height + topOffset + bottomPad) + 'px';
         }
         requestAnimationFrame(() => {
             incoming.style.transition = 'transform 300ms ease';
@@ -602,9 +606,11 @@ document.addEventListener('DOMContentLoaded', () => {
             current.style.transform = direction === 'down' ? 'translateY(-100%)' : 'translateY(100%)';
             incoming.style.transform = 'translateY(0)';
             const onDone = () => {
-                current.style.transition = 'none';
-                incoming.style.transition = 'none';
-                current.style.transform = 'translateY(0)';
+                // Clear inline styles so CSS hover rules (transform) can apply
+                current.style.transition = '';
+                incoming.style.transition = '';
+                current.style.transform = '';
+                incoming.style.transform = '';
                 current.style.visibility = 'hidden';
                 activeCard = incoming;
                 updateAuthor(post);
@@ -637,7 +643,11 @@ document.addEventListener('DOMContentLoaded', () => {
         fillCard(activeCard, feedPosts[0]);
         updateAuthor(feedPosts[0]);
         if (viewport && !viewport.style.height) {
-            viewport.style.height = activeCard.getBoundingClientRect().height + 'px';
+            const vpStyle = getComputedStyle(viewport);
+            const cardStyle = getComputedStyle(activeCard);
+            const topOffset = parseFloat(cardStyle.top) || activeCard.offsetTop || 0;
+            const bottomPad = parseFloat(vpStyle.paddingBottom) || 0;
+            viewport.style.height = (activeCard.getBoundingClientRect().height + topOffset + bottomPad) + 'px';
         }
         updatePaginatorButtons();
     }
@@ -809,16 +819,15 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!dataEl) return;
     
     const attendingPosts = JSON.parse(dataEl.textContent).reverse();
-    if (attendingPosts.length <= 3) return; 
-    
+
     const viewport = document.querySelector('.attending-carousel-viewport');
     const prevBtn = document.getElementById('prev-attending-btn');
     const nextBtn = document.getElementById('next-attending-btn');
-    
+
     let currentIndex = 0;
     const cardWidth = 280;
     const gap = 20;
-    
+
     function createCard(post, slotIndex) {
         const card = document.createElement('div');
         card.className = 'event-card attending-carousel-card';
@@ -871,33 +880,102 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function renderCarousel() {
+        if (!viewport) return;
         viewport.innerHTML = '';
-        const visible = getVisiblePosts();
+        const visible = getVisiblePosts().filter(Boolean);
         visible.forEach((post, slotIndex) => {
             viewport.appendChild(createCard(post, slotIndex));
         });
-        
-        prevBtn.disabled = currentIndex === 0;
-        nextBtn.disabled = currentIndex + 3 >= attendingPosts.length;
+
+        // If there are less than 3 posts, center them by adjusting left offsets
+        if (attendingPosts.length < 3) {
+            const cards = viewport.querySelectorAll('.attending-carousel-card');
+            cards.forEach((c, i) => {
+                // center within available space
+                c.style.left = `${i * (cardWidth + gap)}px`;
+            });
+        }
+
+        if (prevBtn) prevBtn.disabled = currentIndex === 0;
+        if (nextBtn) nextBtn.disabled = currentIndex + 3 >= attendingPosts.length;
     }
     
-    prevBtn.addEventListener('click', () => {
+    if (prevBtn) prevBtn.addEventListener('click', () => {
         if (currentIndex > 0) {
             currentIndex--;
             renderCarousel('prev');
         }
     });
-    
-    nextBtn.addEventListener('click', () => {
+
+    if (nextBtn) nextBtn.addEventListener('click', () => {
         if (currentIndex + 3 < attendingPosts.length) {
             currentIndex++;
             renderCarousel('next');
         }
     });
-    
+
+    // Expose a small manager so other parts of the app can add/remove posts
+    window.attendingManager = {
+        posts: attendingPosts,
+        render: renderCarousel,
+        addPost(post) {
+            if (!post) return;
+            const exists = this.posts.find(p => p.id === post.id);
+            if (exists) return;
+            this.posts.push(post);
+            // keep ordered by date if possible
+            try {
+                this.posts.sort((a, b) => new Date(a.date) - new Date(b.date));
+            } catch (err) {}
+            // if we were showing fewer than 3 posts, ensure index is valid
+            if (currentIndex + 3 > this.posts.length && this.posts.length >= 3) {
+                currentIndex = Math.max(0, this.posts.length - 3);
+            }
+            renderCarousel();
+        },
+        removePost(postId) {
+            if (!postId) return;
+            this.posts = this.posts.filter(p => p.id !== postId);
+            // adjust currentIndex if we've removed the last page
+            if (currentIndex > Math.max(0, this.posts.length - 3)) {
+                currentIndex = Math.max(0, this.posts.length - 3);
+            }
+            renderCarousel();
+        }
+    };
+
+    // Listen for attend toggles triggered elsewhere in the app
+    document.addEventListener('attending:changed', (ev) => {
+        const detail = ev.detail || {};
+        const isAttending = !!detail.is_attending;
+        const post = detail.post || null;
+        if (isAttending && post) {
+            window.attendingManager.addPost(post);
+        } else if (!isAttending && post && post.id) {
+            window.attendingManager.removePost(post.id);
+        }
+    });
+
+    // initial render (always render from JSON so it's authoritative)
     renderCarousel();
 });
 </script>
+<script>
+// Make server-rendered or JS-rendered attending cards clickable without affecting like-button
+document.addEventListener('DOMContentLoaded', () => {
+    const viewport = document.querySelector('.attending-carousel-viewport');
+    if (!viewport) return;
+    viewport.addEventListener('click', (e) => {
+        if (e.target.closest('#like-button')) return;
+        const card = e.target.closest('.event-card');
+        if (!card) return;
+        const postId = card.dataset.postId || (card.id && (card.id.match(/(\d+)/) || [])[0]);
+        if (!postId) return;
+        window.location.assign(`/posts/${postId}/`);
+    });
+});
+</script>
+
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     function getCookie(name) {

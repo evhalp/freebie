@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -142,4 +143,32 @@ def toggle_attending_view(request, id):
     reaction, _ = Reaction.objects.get_or_create(post=post, user=request.user)
     reaction.is_attending = not reaction.is_attending
     reaction.save()
-    return JsonResponse({'is_attending': reaction.is_attending})
+    # Build a serialized post representation for AJAX consumers so the
+    # frontend can add/remove items from the My Attending list without a full reload.
+    image_obj = post.images.first()
+    if image_obj and getattr(image_obj, 'image', None) and getattr(image_obj.image, 'name', None):
+        image_url = image_obj.image.url
+    else:
+        from django.conf import settings
+        image_url = settings.MEDIA_URL + 'default.png'
+
+    post_data = {
+        'id': post.id,
+        'url': reverse('posts', args=[post.id]),
+        'title': post.title,
+        'location': post.location or '',
+        'description': post.description,
+        'image': image_url,
+        'date': post.start_time.strftime('%B %d, %Y'),
+        'like_count': post.reactions.filter(sentiment='LIKE').count(),
+        'user_liked': post.reactions.filter(user=request.user, sentiment='LIKE').exists(),
+        'tags': [
+            {
+                'name': t.name,
+                'bg': t.bg_color,
+                'text': t.text_color
+            } for t in post.tags.all()[:3]
+        ]
+    }
+
+    return JsonResponse({'is_attending': reaction.is_attending, 'post': post_data})

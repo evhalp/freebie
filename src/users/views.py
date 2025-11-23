@@ -50,11 +50,7 @@ def dashboard(request):
         
         # Feed from people user follows
         following_ids = request.user.userprofile.following.values_list('user__id', flat=True)
-        following_feed = (
-            Post.objects.filter(user__id__in=following_ids)
-            .annotate(like_count=Count('reactions', filter=Q(reactions__sentiment='LIKE'), distinct=True))
-            .order_by('-created_at')[:8]
-        )
+        following_feed = Post.objects.filter(user__id__in=following_ids).order_by('-created_at')[:8]
         
         # Prepare feed data for JSON injection
         feed_data = []
@@ -78,10 +74,7 @@ def dashboard(request):
                 'description': post.description,
                 'image': image_url,
                 'date': post.start_time.strftime('%B %d, %Y'),
-                # Accurate like count per post
-                'like_count': post.reactions.filter(sentiment='LIKE').count(),
-                # Whether current user liked the post
-                'user_liked': post.reactions.filter(user=request.user, sentiment='LIKE').exists(),
+                'like_count': getattr(post, 'like_count', 0),
                 'author_username': post.user.username,
                 'author_url': reverse('user_profile', args=[post.user.username]),
                 'author_image': author_image,
@@ -97,11 +90,7 @@ def dashboard(request):
         feed_data_json = json.dumps(feed_data)
         
         # Prepare attending posts data for carousel
-        attending_posts = (
-            Post.objects.filter(reactions__user=request.user, reactions__is_attending=True)
-            .annotate(like_count=Count('reactions', filter=Q(reactions__sentiment='LIKE'), distinct=True))
-            .order_by('start_time')
-        )
+        attending_posts = Post.objects.filter(reactions__user=request.user, reactions__is_attending=True).order_by('-start_time')
         attending_data = []
         for post in attending_posts:
             image_obj = post.images.first()
@@ -118,7 +107,6 @@ def dashboard(request):
                 'image': image_url,
                 'date': post.start_time.strftime('%B %d, %Y'),
                 'like_count': post.reactions.filter(sentiment='LIKE').count(),
-                'user_liked': post.reactions.filter(user=request.user, sentiment='LIKE').exists(),
                 'tags': [
                     {
                         'name': t.name,
@@ -224,6 +212,7 @@ def toggle_follow(request, username):
     try:
         target_user = get_object_or_404(User, username=username)
         
+        # Cannot follow/unfollow yourself
         if target_user == request.user:
             return JsonResponse({'error': 'Cannot follow yourself'}, status=400)
         
