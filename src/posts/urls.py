@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import edit_post_view, post_view, toggle_like_view
+from .views import edit_post_view, post_view, toggle_like_view, toggle_attend_view
 
 urlpatterns = [
     path('<int:id>/', post_view, name='posts'),
