@@ -14,6 +14,9 @@
   <form class="search-bar-form" method="get" action="">
     <div class="search-filters">
       <p>Sort by:</p>
+      <button type="submit" name="sort" value="for_you" formnovalidate
+        class="{% if sort == 'for_you' %}active-sort{% endif %}" id="for-you">For You</button>
+
       <button type="submit" name="sort" value="popular" formnovalidate
         class="{% if sort == 'popular' %}active-sort{% endif %}" id="popular">Popular</button>
 

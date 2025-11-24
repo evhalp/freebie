@@ -4,6 +4,7 @@ from django.contrib import messages
 from .models import Post, Reaction, PostImage
 from .forms import PostCreationForm, PostImageFormSet
 from users.models import User, UserProfile
+from users.weights import adjust_credibility, W_LIKE, W_ATTEND, W_POSTS
 
 @login_required
 def create_post_view(request):
@@ -38,6 +39,12 @@ def create_post_view(request):
             # Let the formset save and attach images to `post`
             saved_objs = formset.save()
             print('DEBUG: saved objects count:', len(saved_objs))
+            # Apply post creation penalty to the author's credibility
+            try:
+                adjust_credibility(request.user, -W_POSTS)
+            except Exception:
+                # don't block post creation if this errors for some reason
+                pass
             return redirect('posts', id=post.id)
         else:
             # Provide detailed formset errors to help debugging/feedback
@@ -119,12 +126,64 @@ def toggle_like_view(request, id):
     if created:
         reaction.sentiment = 'LIKE'
         reaction.save()
+        # increment author's credibility
+        try:
+            adjust_credibility(post.user, W_LIKE)
+        except Exception:
+            pass
     else:
         # toggle: if already LIKE -> remove sentiment; otherwise set to LIKE
         if reaction.sentiment == 'LIKE':
             reaction.sentiment = None
+            try:
+                adjust_credibility(post.user, -W_LIKE)
+            except Exception:
+                pass
         else:
             reaction.sentiment = 'LIKE'
+            try:
+                adjust_credibility(post.user, W_LIKE)
+            except Exception:
+                pass
+        reaction.save()
+
+    return redirect('posts', id=id)
+
+
+@login_required
+def toggle_attend_view(request, id):
+    """Toggle the is_attending flag for the logged-in user on the given post.
+
+    Creates a Reaction if one doesn't exist and toggles the is_attending boolean.
+    Adjusts the post author's credibility accordingly.
+    """
+    if request.method != 'POST':
+        return redirect('posts', id=id)
+
+    post = get_object_or_404(Post, id=id)
+
+    reaction, created = Reaction.objects.get_or_create(post=post, user=request.user)
+
+    if created:
+        reaction.is_attending = True
+        reaction.save()
+        try:
+            adjust_credibility(post.user, W_ATTEND)
+        except Exception:
+            pass
+    else:
+        if reaction.is_attending:
+            reaction.is_attending = False
+            try:
+                adjust_credibility(post.user, -W_ATTEND)
+            except Exception:
+                pass
+        else:
+            reaction.is_attending = True
+            try:
+                adjust_credibility(post.user, W_ATTEND)
+            except Exception:
+                pass
         reaction.save()
 
     return redirect('posts', id=id)
