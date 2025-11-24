@@ -107,10 +107,13 @@
                 </form>
             </div>
 
-            <button class="action-btn going-btn">
-                <i class="fa-solid fa-calendar-check"></i>
-                <span>I'm going!</span>
-            </button>
+            <form method="post" action="{% url 'post-attend' post.id %}" class="attend-form">
+                {% csrf_token %}
+                <button type="submit" class="action-btn going-btn {% if user_is_attending %}going{% endif %}">
+                    <i class="fa-solid fa-calendar-check"></i>
+                    <span class="attending-count">{{ attending_count|default:0 }}</span>
+                </button>
+            </form>
 
             <button class="action-btn comment-btn">
                 <i class="fa-solid fa-comment"></i>
