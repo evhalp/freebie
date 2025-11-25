@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Create Post{% endblock title %}
+{% block title %}{% if is_editing %}Freebie - Edit Post{% else %}Freebie - Create Post{% endif %}{% endblock title %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/create_post_form.css' %}">
@@ -112,7 +112,7 @@
     {% endif %}
 
     <div class="form-actions">
-        <button type="submit">Create Post</button>
+        <button type="submit">{% if is_editing %}Save Post{% else %}Create Post{% endif %}</button>
     </div>
 </form>
 {%endblock content %}

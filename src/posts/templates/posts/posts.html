@@ -11,17 +11,17 @@
 
 {% block content %}
 {% if messages %}
-    {% for message in messages %}
-        {% if 'followed' in message.message|lower and 'unfollowed' not in message.message|lower %}
-        <div class="toast-message toast-success" id="toast-message">
-            {{ message }}
-        </div>
-        {% elif 'unfollowed' in message.message|lower %}
-        <div class="toast-message toast-error" id="toast-message">
-            {{ message }}
-        </div>
-        {% endif %}
-    {% endfor %}
+{% for message in messages %}
+{% if 'followed' in message.message|lower and 'unfollowed' not in message.message|lower %}
+<div class="toast-message toast-success" id="toast-message">
+    {{ message }}
+</div>
+{% elif 'unfollowed' in message.message|lower %}
+<div class="toast-message toast-error" id="toast-message">
+    {{ message }}
+</div>
+{% endif %}
+{% endfor %}
 {% endif %}
 
 <div class="post-container">
@@ -68,11 +68,15 @@
                 </div>
                 <span class="username-post">{{ author.username }}</span>
             </div>
-            {% if user.is_authenticated and user != author %}
+            {% if user.is_authenticated and user == author %}
+            <a href="{% url 'edit_post' post.id %}" class="edit-btn">Edit Post</a>
+            {% elif user.is_authenticated and user != author %}
             <form method="post" class="follow-form" style="margin-left:auto;">
                 {% csrf_token %}
                 <input type="hidden" name="follow_toggle" value="1">
-                <button type="submit" class="follow-btn toggle-follow-btn" data-username="{{ author.username }}">{% if is_following %}Unfollow{% else %}Follow{% endif %}</button>
+                <button type="submit" class="follow-btn">
+                    {% if is_following %}Unfollow{% else %}Follow{%endif%}
+                </button>
             </form>
             {% endif %}
         </div>
@@ -86,11 +90,7 @@
             </div>
             <div class="meta-item">
                 <i class="fa-solid fa-clock"></i>
-                <span>Starts: {{ post.start_time|date:"M d, Y - g:i A" }}</span>
-            </div>
-            <div class="meta-item">
-                <i class="fa-solid fa-hourglass-end"></i>
-                <span>Ends: {{ post.end_time|date:"M d, Y - g:i A" }}</span>
+                <span>{{ post.start_time|date:"M d, Y - g:i A" }}</span>
             </div>
         </div>
 
@@ -100,7 +100,7 @@
 
         <div class="post-actions">
             <div class="action-group">
-                <form method="post" action="{% url 'post-like' post.id %}" class="like-form">
+                <form method="post" action="{% url 'like_post' post.id %}" class="like-form">
                     {% csrf_token %}
                     <button type="submit" class="action-btn like-btn {% if user_liked %}liked{% endif %}">
                         <i class="fa-solid fa-thumbs-up"></i>
@@ -109,12 +109,11 @@
                 </form>
             </div>
 
-            <form method="post" action="" class="attend-form" style="display:inline;">
+            <form method="post" action="{% url 'post-attend' post.id %}" class="attend-form">
                 {% csrf_token %}
-                <input type="hidden" name="attend_toggle" value="1" />
-                <button type="submit" class="action-btn going-btn {% if is_attending %}going{% endif %}" id="attend-btn">
+                <button type="submit" class="action-btn going-btn {% if user_is_attending %}going{% endif %}">
                     <i class="fa-solid fa-calendar-check"></i>
-                    <span>{% if is_attending %}Attending{% else %}I'm going!{% endif %}</span>
+                    <span class="attending-count">{{ attending_count|default:0 }}</span>
                 </button>
             </form>
 
@@ -127,32 +126,6 @@
 </div>
 
 <script>
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
-
-    function showToast(message, type) {
-        const existing = document.getElementById('toast-message');
-        if (existing) existing.remove();
-        const toast = document.createElement('div');
-        toast.id = 'toast-message';
-        toast.className = 'toast-message ' + (type === 'success' ? 'toast-success' : 'toast-error');
-        toast.textContent = message;
-        document.body.appendChild(toast);
-        setTimeout(() => { toast.remove(); }, 3000);
-    }
-
     let currentImageIndex = 0;
     const images = document.querySelectorAll('.gallery-image');
     const dots = document.querySelectorAll('.dot');
@@ -221,79 +194,20 @@
         startAutoPlay();
     }
 
-    const attendBtn = document.getElementById('attend-btn');
-    if (attendBtn) {
-        attendBtn.addEventListener('click', async (e) => {
-            e.preventDefault();
-            const csrftoken = getCookie('csrftoken');
-            try {
-                const response = await fetch(window.location.pathname + 'attend/', {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRFToken': csrftoken,
-                        'Content-Type': 'application/json'
-                    }
-                });
-                const data = await response.json();
-                if (response.ok) {
-                    attendBtn.classList.toggle('going', data.is_attending);
-                    attendBtn.querySelector('span').textContent = data.is_attending ? 'Attending' : "I'm going!";
-                    showToast(data.is_attending ? 'Marked as attending.' : 'Removed attending status.', data.is_attending ? 'success' : 'error');
-                    // Notify other parts of the app (dashboard) so My Attending can update live
-                    try {
-                        const eventDetail = { is_attending: data.is_attending, post: data.post || null };
-                        document.dispatchEvent(new CustomEvent('attending:changed', { detail: eventDetail }));
-                    } catch (err) {
-                        // Not critical; continue silently
-                        console.warn('Could not dispatch attending:changed event', err);
-                    }
-                }
-            } catch (err) {
-                showToast('Failed to update attending.', 'error');
-            }
+    const goingBtn = document.querySelector('.going-btn');
+    if (goingBtn) {
+        goingBtn.addEventListener('click', function () {
+            this.classList.toggle('going');
         });
     }
 
+    // Auto-remove toast message after animation
     const toastMessage = document.getElementById('toast-message');
     if (toastMessage) {
         setTimeout(() => {
             toastMessage.remove();
         }, 3000);
     }
-
-    document.addEventListener('DOMContentLoaded', () => {
-        const followBtn = document.querySelector('.toggle-follow-btn');
-        if (!followBtn) return;
-        followBtn.addEventListener('click', async (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            const username = followBtn.dataset.username;
-            try {
-                const csrftoken = getCookie('csrftoken');
-                const response = await fetch(`/toggle-follow/${username}/`, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRFToken': csrftoken,
-                        'Content-Type': 'application/json'
-                    }
-                });
-                const data = await response.json();
-                if (response.ok) {
-                    if (data.is_following) {
-                        followBtn.textContent = 'Unfollow';
-                        showToast(`You followed ${username}`, 'success');
-                    } else {
-                        followBtn.textContent = 'Follow';
-                        showToast(`You unfollowed ${username}`, 'error');
-                    }
-                } else {
-                    showToast('Action failed. Please try again.', 'error');
-                }
-            } catch (err) {
-                showToast('An error occurred. Please try again.', 'error');
-            }
-        });
-    });
 </script>
 
 {% endblock content %}
