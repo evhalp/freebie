@@ -7,20 +7,26 @@ from users.models import User, UserProfile
 from users.weights import adjust_credibility, W_LIKE, W_ATTEND, W_POSTS
 
 @login_required
-def create_post_view(request):
-    if request.method == 'POST':
-        form = PostCreationForm(request.POST, request.FILES)
+def edit_post_view(request, id=None):
+
+    if id is not None:
+        post = get_object_or_404(Post, id=id)
+        if post.user != request.user:
+            print(post.user, request.user)
+            return redirect('posts', id=id)
+        is_editing = True
+    else:
         post = None
+        is_editing = False
+
+    if request.method == 'POST':
+        form = PostCreationForm(request.POST, request.FILES, instance=post)
+
         if form.is_valid():
             post = form.save(commit=False)
             post.user = request.user
             post.save()
             form.save_m2m()
-        else:
-            # If the main form is invalid, re-render with an empty image formset
-            formset = PostImageFormSet(request.POST, request.FILES, queryset=PostImage.objects.none())
-            context = {'form': form, 'formset': formset, 'user': request.user}
-            return render(request, 'posts/create_post.html', context)
 
         # Bind the POSTed image forms to the newly created post instance
         formset = PostImageFormSet(request.POST, request.FILES, instance=post)
@@ -47,19 +53,34 @@ def create_post_view(request):
                 pass
             return redirect('posts', id=post.id)
         else:
-            # Provide detailed formset errors to help debugging/feedback
-            print('DEBUG: formset.errors:', formset.errors)
-            messages.error(request, 'Image form is invalid')
+            if is_editing:
+                formset = PostImageFormSet(request.POST, request.FILES, instance=post)
+            else:
+                formset = PostImageFormSet(request.POST, request.FILES, queryset=PostImage.objects.none())
+            context = {
+                'form': form, 
+                'formset': formset, 
+                'user': request.user, 
+                'post': post, 
+                'is_editing': is_editing
+            }
+            return render(request, 'posts/edit_post.html', context)
     else:
-        form = PostCreationForm()
-        formset = PostImageFormSet(queryset=PostImage.objects.none())
+        if is_editing:
+            form = PostCreationForm(instance=post)
+            formset = PostImageFormSet(instance=post)
+        else:
+            form = PostCreationForm()
+            formset = PostImageFormSet(queryset=PostImage.objects.none())    
 
     context = {
-        'form': form,
-        'formset': formset,
-        'user': request.user
+        'form': form, 
+        'formset': formset, 
+        'user': request.user, 
+        'post': post, 
+        'is_editing': is_editing
     }
-    return render(request, 'posts/create_post.html', context)
+    return render(request, 'posts/edit_post.html', context)
 
 def post_view(request, id):
 
@@ -77,6 +98,12 @@ def post_view(request, id):
     user_liked = False
     if request.user.is_authenticated:
         user_liked = post.reactions.filter(user=request.user, sentiment='LIKE').exists()
+
+    # attending count and whether current user is attending
+    attending_count = post.reactions.filter(is_attending=True).count()
+    user_is_attending = False
+    if request.user.is_authenticated:
+        user_is_attending = post.reactions.filter(user=request.user, is_attending=True).exists()
 
     if request.method == 'POST' and request.user.is_authenticated:
         if 'follow_toggle' in request.POST and profile and request.user != post_author:
@@ -100,6 +127,8 @@ def post_view(request, id):
         'profile': profile,
         'like_count': like_count,
         'user_liked': user_liked,
+        'attending_count': attending_count,
+        'user_is_attending': user_is_attending,
         'is_following': is_following,
     }
 

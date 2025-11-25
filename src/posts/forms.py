@@ -15,17 +15,7 @@ class PostCreationForm(forms.ModelForm):
                 'class': 'form-input',
                 'placeholder': 'Enter post description',
                 'rows': 5,
-                'columns': 40,
-                'style': (
-                    'width: 100%; '
-                    'padding: 0.5rem; '
-                    'border: 1px solid #ccc; '
-                    'border-radius: 5px; '
-                    'font-size: 1rem; '
-                    'font-family: Arial, sans-serif; '
-                    'resize: none;'
-                ),
-                
+                'cols': 40,
             }),
             'location': forms.TextInput(attrs={
                 'class': 'form-input',
