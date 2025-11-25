@@ -167,3 +167,26 @@ def toggle_attend_view(request, id):
     reaction.save()
 
     return redirect('posts', id=id)
+
+
+@login_required
+def toggle_attend_view(request, id):
+    """Toggle the is_attending flag for the logged-in user on the given post.
+
+    - If the user has no Reaction for the post, create one and set is_attending=True.
+    - Otherwise toggle the boolean and save.
+
+    Redirects back to the post detail page.
+    """
+    if request.method != 'POST':
+        return redirect('posts', id=id)
+
+    post = get_object_or_404(Post, id=id)
+
+    reaction, created = Reaction.objects.get_or_create(post=post, user=request.user)
+
+    # Toggle attending flag
+    reaction.is_attending = not bool(reaction.is_attending)
+    reaction.save()
+
+    return redirect('posts', id=id)

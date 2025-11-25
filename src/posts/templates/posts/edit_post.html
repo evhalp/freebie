@@ -22,7 +22,7 @@
 </div>
 {% endif %}
 
-<form method="post" action="{% url 'create_post' %}" enctype="multipart/form-data" class="create-post-form">
+<form method="post" action="{% if is_editing %}{% url 'edit_post' post.id %}{% else %}{% url 'create_post' %}{% endif %}" enctype="multipart/form-data" class="create-post-form">
     {% csrf_token %}
 
     <div class="form-section">

@@ -213,6 +213,13 @@
     opacity: 0.85;
 }
 
+.follow-btn,
+.follow-btn:visited {
+    color: #fff;
+    text-decoration: none;
+    display: inline-block;
+}
+
 .post-title {
     font-size: 1.5rem;
     font-weight: 700;
