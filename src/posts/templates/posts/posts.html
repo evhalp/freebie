@@ -11,17 +11,17 @@
 
 {% block content %}
 {% if messages %}
-    {% for message in messages %}
-        {% if 'followed' in message.message|lower and 'unfollowed' not in message.message|lower %}
-        <div class="toast-message toast-success" id="toast-message">
-            {{ message }}
-        </div>
-        {% elif 'unfollowed' in message.message|lower %}
-        <div class="toast-message toast-error" id="toast-message">
-            {{ message }}
-        </div>
-        {% endif %}
-    {% endfor %}
+{% for message in messages %}
+{% if 'followed' in message.message|lower and 'unfollowed' not in message.message|lower %}
+<div class="toast-message toast-success" id="toast-message">
+    {{ message }}
+</div>
+{% elif 'unfollowed' in message.message|lower %}
+<div class="toast-message toast-error" id="toast-message">
+    {{ message }}
+</div>
+{% endif %}
+{% endfor %}
 {% endif %}
 
 <div class="post-container">
@@ -58,7 +58,7 @@
 
     <div class="post-details">
         <div class="post-header">
-            <div class="user-info">
+            <a class="user-info" href="{% url 'user_profile' author.username %}">
                 <div class="profile-image-container">
                     {% if profile and profile.image %}
                     <img src="{{ profile.image.url }}" alt="{{ author.username }}">
@@ -67,14 +67,16 @@
                     {% endif %}
                 </div>
                 <span class="username-post">{{ author.username }}</span>
-            </div>
+            </a>
             {% if user.is_authenticated and user == author %}
             <a href="{% url 'edit_post' post.id %}" class="follow-btn">Edit Post</a>
             {% elif user.is_authenticated and user != author %}
             <form method="post" class="follow-form" style="margin-left:auto;">
                 {% csrf_token %}
                 <input type="hidden" name="follow_toggle" value="1">
-                <button type="submit" class="follow-btn">{% if is_following %}Unfollow{% else %}Follow{% endif %}</button>
+                <button type="submit" class="follow-btn">
+                    {% if is_following %}Unfollow{% else %}Follow{%endif%}
+                </button>
             </form>
             {% endif %}
         </div>
