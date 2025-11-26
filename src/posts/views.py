@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Post, Reaction, PostImage
-from .forms import PostCreationForm, PostImageFormSet
+from .models import Post, Reaction, PostImage, Comment
+from .forms import PostCreationForm, PostImageFormSet, CommentForm
 from users.models import UserProfile
 
 @login_required
@@ -85,7 +85,12 @@ def post_view(request, id):
     if request.user.is_authenticated:
         user_is_attending = post.reactions.filter(user=request.user, is_attending=True).exists()
 
+    # Comments
+    comments = post.comments.filter(parent=None).select_related('user')
+    comment_form = CommentForm()
+
     if request.method == 'POST' and request.user.is_authenticated:
+        # follow button
         if 'follow_toggle' in request.POST and profile and request.user != post_author:
             actor_profile = request.user.userprofile
             target_profile = profile
@@ -95,6 +100,32 @@ def post_view(request, id):
             else:
                 actor_profile.follow(target_profile)
                 messages.success(request, f"You followed {post_author.username}.")
+            return redirect('posts', id=id)
+        # comments
+        elif 'comment_submit' in request.POST:
+            comment_form = CommentForm(request.POST)
+            if comment_form.is_valid():
+                comment = comment_form.save(commit=False)
+                comment.post = post
+                comment.user = request.user
+
+                parent_id = request.POST.get('parent_id')
+                if parent_id:
+                    try:
+                        parent_comment = Comment.objects.get(id=parent_id)
+                        comment.parent = parent_comment
+                    except:
+                        pass
+
+                comment.save()
+                return redirect('posts', id=id)
+        elif 'comment_delete' in request.POST:
+            comment_id = request.POST.get('comment_id')
+            try:
+                comment = Comment.objects.get(id=comment_id, user=request.user)
+                comment.delete()
+            except Comment.DoesNotExist:
+                pass
             return redirect('posts', id=id)
 
     is_following = False
@@ -110,6 +141,8 @@ def post_view(request, id):
         'attending_count': attending_count,
         'user_is_attending': user_is_attending,
         'is_following': is_following,
+        'comments': comments,
+        'comment_form': comment_form,
     }
 
     return render(request, 'posts/posts.html', context)
