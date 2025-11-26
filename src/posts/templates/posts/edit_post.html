@@ -20,7 +20,9 @@
 </div>
 {% endif %}
 
-<form method="post" action="{% if is_editing %}{% url 'edit_post' post.id %}{% else %}{% url 'create_post' %}{% endif %}" enctype="multipart/form-data" class="create-post-form">
+<form method="post"
+    action="{% if is_editing %}{% url 'edit_post' post.id %}{% else %}{% url 'create_post' %}{% endif %}"
+    enctype="multipart/form-data" class="create-post-form">
     {% csrf_token %}
 
     <div class="form-section">
@@ -111,6 +113,11 @@
 
     <div class="form-actions">
         <button type="submit">{% if is_editing %}Save Post{% else %}Create Post{% endif %}</button>
+        {% if is_editing %}
+        <button type="submit" name="delete" value="1" type="submit" style="background-color: rgb(220,38,38);">
+            Delete Post
+        </button>
+        {% endif%}
     </div>
 </form>
 {%endblock content %}
