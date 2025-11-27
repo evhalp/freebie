@@ -2,7 +2,11 @@
 <div class="comment">
     <a class="user-info-comment">
         <div class="profile-image-container-comment">
+            {% if comment.user.userprofile.image.url %}
+            <img src="{{ comment.user.userprofile.image.url }}" alt="{{ comment.user }}">
+            {% else %}
             <div class="default-avatar-comment">{{ comment.user }}</div>
+            {% endif %}
         </div>
         <span class="username-post-comment">{{ comment.user }}</span>
         <div class="comment-date">{{ comment.created_at }}</div>
