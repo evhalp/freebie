@@ -146,18 +146,30 @@
     border-bottom: 2px solid #cbd5e1;
 }
 
-.user-info {
+.user-info,
+.user-info-comment {
     display: flex;
     align-items: center;
     gap: 0.75rem;
 }
 
-.profile-image-container {
+.user-info-comment {
+    align-items: flex-start;
+    margin-top: 0.5rem;
+}
+
+.profile-image-container,
+.profile-image-container-comment {
     width: 50px;
     height: 50px;
     border-radius: 50%;
     overflow: hidden;
     background-color: #e2e8f0;
+}
+
+.profile-image-container-comment {
+    width: 30px;
+    height: 30px;
 }
 
 .profile-image-container img {
@@ -166,7 +178,8 @@
     object-fit: cover;
 }
 
-.default-avatar {
+.default-avatar,
+.default-avatar-comment {
     width: 100%;
     height: 100%;
     display: flex;
@@ -178,10 +191,21 @@
     font-weight: bold;
 }
 
-.username-post {
+.default-avatar-comment {
+    font-size: 1.2rem;
+}
+
+.username-post,
+.username-post-comment {
     font-weight: 600;
     font-size: 1.1rem;
     color: var(--text-color);
+}
+
+.username-post-comment {
+    font-size: .8rem;
+    display: inline-block;
+    vertical-align: top;
 }
 
 .follow-btn {
@@ -332,6 +356,19 @@
     color: #dc2626;
     background-color: #fee2e2;
     border: 2px solid #fca5a5;
+}
+
+.comment-date {
+    font-size: .6rem;
+    color: #97a2b1;
+    margin-left: 20%;
+}
+
+.comment-content {
+    font-size: .8rem;
+    margin-top: -10px;
+    margin-left: -20px;
+    color: var(--text-color);
 }
 
 @keyframes fadeInOut {

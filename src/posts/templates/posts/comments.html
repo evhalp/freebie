@@ -1,7 +1,13 @@
 {%for comment in comments %}
 <div class="comment">
-    <div class="comment-date">{{ comment.created_at }}</div>
-    <div class="comment-author">{{ comment.user }}</div>
+    <a class="user-info-comment">
+        <div class="profile-image-container-comment">
+            <div class="default-avatar-comment">{{ comment.user }}</div>
+        </div>
+        <span class="username-post-comment">{{ comment.user }}</span>
+        <div class="comment-date">{{ comment.created_at }}</div>
+    </a>
+
     <div class="comment-content">{{ comment.content }}</div>
 </div>
 {% endfor %}
