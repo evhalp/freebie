@@ -8,8 +8,11 @@
             <div class="default-avatar-comment">{{ comment.user }}</div>
             {% endif %}
         </div>
-        <span class="username-post-comment">{{ comment.user }}</span>
-        <div class="comment-date">{{ comment.created_at }}</div>
+        <div class=comment-head-text>
+            <span class="username-post-comment">{{ comment.user }}</span>
+            <div class="comment-date">{{ comment.created_at }}</div>
+        </div>
+
     </a>
 
     <div class="comment-content">{{ comment.content }}</div>

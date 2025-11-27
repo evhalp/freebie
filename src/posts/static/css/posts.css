@@ -375,6 +375,13 @@
     border: 2px solid #fca5a5;
 }
 
+.comment-head-text {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    justify-content: space-between;
+}
+
 .comment-date {
     font-size: .6rem;
     color: #97a2b1;
