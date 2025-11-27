@@ -124,15 +124,21 @@
                 </button>
             </div>
             <div class="comments-section">
-                <div class="comment-input">
+                <div class="comment-input" style="display: none;">
                     <form method="POST" class="comment-form">
                         {% csrf_token %}
                         {{ comment_form.content }}
 
                         <input type="hidden" name="parent_id" value=""> <!-- For top-level comments -->
-                        <button type="submit" name="comment_submit" class="btn btn-primary">
-                            Post Comment
-                        </button>
+                        <div class=comment-buttons>
+                            <button type="submit" class="cancel-comment action-btn">
+                                Cancel
+                            </button>
+                            <button type="submit" name="comment_submit" class="action-btn post-comment">
+                                Post Comment
+                            </button>
+                        </div>
+
                     </form>
                 </div>
                 {% include "posts/comments.html" with post=post %}
@@ -196,6 +202,24 @@
     document.querySelectorAll('.paginator-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             stopAutoPlay();
+        });
+    });
+
+    document.querySelectorAll(".action-btn.comment-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const commentInput = document.querySelector(".comment-input");
+            if (commentInput.style.display === "block") {
+                commentInput.style.display = "none";
+            } else {
+                commentInput.style.display = "block";
+            }
+        });
+    });
+    document.querySelectorAll(".cancel-comment").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+            e.preventDefault();
+            const commentInput = document.querySelector(".comment-input");
+            commentInput.style.display = "none";
         });
     });
 

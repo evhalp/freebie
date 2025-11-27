@@ -13,9 +13,10 @@ class PostCreationForm(forms.ModelForm):
             }),
             'description': forms.Textarea(attrs={
                 'class': 'form-input',
+                'style': 'resize: none;',
                 'placeholder': 'Enter post description',
-                'rows': 5,
-                'cols': 40,
+                'rows': 1,
+                'cols': 1,
             }),
             'location': forms.TextInput(attrs={
                 'class': 'form-input',
@@ -86,9 +87,11 @@ class CommentForm(forms.ModelForm):
         fields = ['content']
         widgets = {
             'content': forms.Textarea(attrs={
-                'class': 'comment-input',
-                'placeholder': 'Input comment...',
-                'rows': 3
+                'class': 'form-input',
+                'style': 'resize: none;',
+                'placeholder': 'Enter comment...',
+                'rows': 5,
+                'cols': 40,
             })
         }
         labels = {
