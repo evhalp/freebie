@@ -11,17 +11,17 @@
 
 {% block content %}
 {% if messages %}
-    {% for message in messages %}
-        {% if 'followed' in message.message|lower and 'unfollowed' not in message.message|lower %}
-        <div class="toast-message toast-success" id="toast-message">
-            {{ message }}
-        </div>
-        {% elif 'unfollowed' in message.message|lower %}
-        <div class="toast-message toast-error" id="toast-message">
-            {{ message }}
-        </div>
-        {% endif %}
-    {% endfor %}
+{% for message in messages %}
+{% if 'followed' in message.message|lower and 'unfollowed' not in message.message|lower %}
+<div class="toast-message toast-success" id="toast-message">
+    {{ message }}
+</div>
+{% elif 'unfollowed' in message.message|lower %}
+<div class="toast-message toast-error" id="toast-message">
+    {{ message }}
+</div>
+{% endif %}
+{% endfor %}
 {% endif %}
 
 <div class="post-container">
@@ -74,7 +74,9 @@
             <form method="post" class="follow-form" style="margin-left:auto;">
                 {% csrf_token %}
                 <input type="hidden" name="follow_toggle" value="1">
-                <button type="submit" class="follow-btn">{% if is_following %}Unfollow{% else %}Follow{% endif %}</button>
+                <button type="submit" class="follow-btn">
+                    {% if is_following %}Unfollow{% else %}Follow{% endif%}
+                </button>
             </form>
             {% endif %}
         </div>
@@ -92,34 +94,40 @@
             </div>
         </div>
 
-        <div class="post-description">
-            {{ post.description }}
-        </div>
+        <div class="scroll-content">
+            <div class="post-description">
+                {{ post.description }}
+            </div>
+            <div class="post-actions">
 
-        <div class="post-actions">
-            <div class="action-group">
-                <form method="post" action="{% url 'like_post' post.id %}" class="like-form">
+                <div class="action-group">
+                    <form method="post" action="{% url 'like_post' post.id %}" class="like-form">
+                        {% csrf_token %}
+                        <button type="submit" class="action-btn like-btn {% if user_liked %}liked{% endif %}">
+                            <i class="fa-solid fa-thumbs-up"></i>
+                            <span class="like-count">{{ like_count|default:0 }}</span>
+                        </button>
+                    </form>
+                </div>
+
+                <form method="post" action="{% url 'post-attend' post.id %}" class="attend-form">
                     {% csrf_token %}
-                    <button type="submit" class="action-btn like-btn {% if user_liked %}liked{% endif %}">
-                        <i class="fa-solid fa-thumbs-up"></i>
-                        <span class="like-count">{{ like_count|default:0 }}</span>
+                    <button type="submit" class="action-btn going-btn {% if user_is_attending %}going{% endif %}">
+                        <i class="fa-solid fa-calendar-check"></i>
+                        <span class="attending-count">{{ attending_count|default:0 }}</span>
                     </button>
                 </form>
-            </div>
 
-            <form method="post" action="{% url 'post-attend' post.id %}" class="attend-form">
-                {% csrf_token %}
-                <button type="submit" class="action-btn going-btn {% if user_is_attending %}going{% endif %}">
-                    <i class="fa-solid fa-calendar-check"></i>
-                    <span class="attending-count">{{ attending_count|default:0 }}</span>
+                <button class="action-btn comment-btn">
+                    <i class="fa-solid fa-comment"></i>
+                    <span>Comment</span>
                 </button>
-            </form>
-
-            <button class="action-btn comment-btn">
-                <i class="fa-solid fa-comment"></i>
-                <span>Comment</span>
-            </button>
+            </div>
+            <div class="comments-section">
+                {% include "posts/comments.html" with post=post %}
+            </div>
         </div>
+
     </div>
 </div>
 
