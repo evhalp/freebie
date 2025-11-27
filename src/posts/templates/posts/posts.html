@@ -124,6 +124,17 @@
                 </button>
             </div>
             <div class="comments-section">
+                <div class="comment-input">
+                    <form method="POST" class="comment-form">
+                        {% csrf_token %}
+                        {{ comment_form.content }}
+
+                        <input type="hidden" name="parent_id" value=""> <!-- For top-level comments -->
+                        <button type="submit" name="comment_submit" class="btn btn-primary">
+                            Post Comment
+                        </button>
+                    </form>
+                </div>
                 {% include "posts/comments.html" with post=post %}
             </div>
         </div>

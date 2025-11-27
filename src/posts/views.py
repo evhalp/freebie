@@ -200,3 +200,4 @@ def toggle_attend_view(request, id):
     reaction.save()
 
     return redirect('posts', id=id)
+
