@@ -3,7 +3,8 @@ from django.urls import reverse
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import User, UserProfile, Post, Reaction, PostImage, Comment
+from .models import Post, Reaction, PostImage, Comment
+from users.models import User, UserProfile
 from .forms import PostCreationForm, PostImageFormSet, CommentForm
 from users.weights import adjust_credibility, W_LIKE, W_ATTEND, W_POSTS
 
