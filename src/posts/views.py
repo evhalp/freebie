@@ -19,6 +19,14 @@ def edit_post_view(request, id=None):
         is_editing = False
 
     if request.method == 'POST':
+
+        # Handle post deletion
+        if is_editing and 'delete' in request.POST:
+            post.delete()
+            messages.success(request, "Post deleted successfully.")
+            return redirect('dashboard')
+         
+        # Handle post creation/editing
         form = PostCreationForm(request.POST, request.FILES, instance=post)
 
         if form.is_valid():

@@ -20,7 +20,9 @@
 </div>
 {% endif %}
 
-<form method="post" action="{% if is_editing %}{% url 'edit_post' post.id %}{% else %}{% url 'create_post' %}{% endif %}" enctype="multipart/form-data" class="create-post-form">
+<form method="post"
+    action="{% if is_editing %}{% url 'edit_post' post.id %}{% else %}{% url 'create_post' %}{% endif %}"
+    enctype="multipart/form-data" class="create-post-form">
     {% csrf_token %}
 
     <div class="form-section">
@@ -84,6 +86,8 @@
                 data-form-index="{{ forloop.counter0 }}">
                 <h3>Image {{ forloop.counter }}</h3>
 
+
+
                 <div class="file-input-wrapper">
                     {# Render the file input with original id/name to keep backend intact #}
                     {{ image_form.image }}
@@ -91,6 +95,10 @@
                     <label class="file-input-label" for="{{ image_form.image.id_for_label }}">Choose Image</label>
                     <span class="file-name" data-file-name> No file chosen </span>
                     <button type="button" class="remove-image-btn" data-remove>Remove</button>
+                </div>
+                <div class="image-preview-wrapper hidden" data-preview-wrapper>
+                    <img data-preview-img class="image-preview"
+                        style="max-width: 180px; max-height: 180px; margin-top: 10px;" />
                 </div>
 
                 <div class="caption-wrapper hidden" data-caption-wrapper style="margin-top: 0.75rem;">
@@ -111,6 +119,11 @@
 
     <div class="form-actions">
         <button type="submit">{% if is_editing %}Save Post{% else %}Create Post{% endif %}</button>
+        {% if is_editing %}
+        <button type="submit" name="delete" value="1" style="background-color: rgb(220,38,38);">
+            Delete Post
+        </button>
+        {% endif%}
     </div>
 </form>
 {%endblock content %}
@@ -161,7 +174,28 @@
                 if (captionWrapper) captionWrapper.classList.add('hidden');
             }
         }
+        function updateImagePreview(item) {
+            const input = item.querySelector('input[type="file"]');
+            const previewWrapper = item.querySelector('[data-preview-wrapper]');
+            const previewImg = item.querySelector('[data-preview-img]');
 
+            if (!input || !previewWrapper || !previewImg) return;
+
+            if (input.files && input.files.length > 0) {
+                const file = input.files[0];
+                const reader = new FileReader();
+
+                reader.onload = function (e) {
+                    previewImg.src = e.target.result;
+                    previewWrapper.classList.remove('hidden');
+                };
+
+                reader.readAsDataURL(file);
+            } else {
+                previewImg.src = '';
+                previewWrapper.classList.add('hidden');
+            }
+        }
         const anySelectedInitially = anyFileSelected();
         items.forEach((item, idx) => {
             const input = item.querySelector('input[type="file"]');
@@ -190,6 +224,7 @@
             if (fileInput) {
                 fileInput.addEventListener('change', () => {
                     updateFileNameDisplay(item);
+                    updateImagePreview(item);
                     syncAddButtonVisibility();
                 });
             }
@@ -202,6 +237,7 @@
                     const captionInput = item.querySelector('input[type="text"]');
                     if (captionInput) captionInput.value = '';
                     updateFileNameDisplay(item);
+                    updateImagePreview(item);
 
                     if (idx > 0) {
                         item.classList.add('hidden');
