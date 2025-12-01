@@ -3,9 +3,8 @@ from django.urls import reverse
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Post, Reaction, PostImage
-from .forms import PostCreationForm, PostImageFormSet
-from users.models import User, UserProfile
+from .models import User, UserProfile, Post, Reaction, PostImage, Comment
+from .forms import PostCreationForm, PostImageFormSet, CommentForm
 from users.weights import adjust_credibility, W_LIKE, W_ATTEND, W_POSTS
 
 @login_required
@@ -113,7 +112,12 @@ def post_view(request, id):
     if request.user.is_authenticated:
         user_is_attending = post.reactions.filter(user=request.user, is_attending=True).exists()
 
+    # Comments
+    comments = post.comments.filter(parent=None).select_related('user')
+    comment_form = CommentForm()
+
     if request.method == 'POST' and request.user.is_authenticated:
+        # follow button
         if 'follow_toggle' in request.POST and profile and request.user != post_author:
             actor_profile = request.user.userprofile
             target_profile = profile
@@ -124,7 +128,32 @@ def post_view(request, id):
                 actor_profile.follow(target_profile)
                 messages.success(request, f"You followed {post_author.username}.")
             return redirect('posts', id=id)
-        if 'attend_toggle' in request.POST:
+        # comments
+        elif 'comment_submit' in request.POST:
+            comment_form = CommentForm(request.POST)
+            if comment_form.is_valid():
+                comment = comment_form.save(commit=False)
+                comment.post = post
+                comment.user = request.user
+
+                parent_id = request.POST.get('parent_id')
+                if parent_id:
+                    try:
+                        parent_comment = Comment.objects.get(id=parent_id)
+                        comment.parent = parent_comment
+                    except:
+                        pass
+
+                comment.save()
+                return redirect('posts', id=id)
+        elif 'comment_delete' in request.POST:
+            comment_id = request.POST.get('comment_id')
+            try:
+                comment = Comment.objects.get(id=comment_id, user=request.user)
+                comment.delete()
+            except Comment.DoesNotExist:
+                pass
+        elif 'attend_toggle' in request.POST:
             reaction, _ = Reaction.objects.get_or_create(post=post, user=request.user)
             reaction.is_attending = not reaction.is_attending
             reaction.save()
@@ -144,8 +173,9 @@ def post_view(request, id):
         'like_count': like_count,
         'user_liked': user_liked,
         'attending_count': attending_count,
-        'user_is_attending': user_is_attending,
         'is_following': is_following,
+        'comments': comments,
+        'comment_form': comment_form,
         'is_attending': Reaction.objects.filter(post=post, user=request.user, is_attending=True).exists() if request.user.is_authenticated else False,
     }
 
@@ -247,3 +277,4 @@ def toggle_attend_view(request, id):
     reaction.save()
 
     return redirect('posts', id=id)
+

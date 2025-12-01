@@ -1,5 +1,5 @@
 from django import forms
-from .models import Post, PostImage
+from .models import Post, PostImage, Comment
 
 class PostCreationForm(forms.ModelForm):
 
@@ -13,9 +13,10 @@ class PostCreationForm(forms.ModelForm):
             }),
             'description': forms.Textarea(attrs={
                 'class': 'form-input',
+                'style': 'resize: none;',
                 'placeholder': 'Enter post description',
-                'rows': 5,
-                'cols': 40,
+                'rows': 1,
+                'cols': 1,
             }),
             'location': forms.TextInput(attrs={
                 'class': 'form-input',
@@ -77,6 +78,24 @@ class PostImageForm(forms.ModelForm):
         labels = {
             'image': 'Image',
             'caption': 'Caption',
+        }
+
+class CommentForm(forms.ModelForm):
+
+    class Meta:
+        model = Comment
+        fields = ['content']
+        widgets = {
+            'content': forms.Textarea(attrs={
+                'class': 'form-input',
+                'style': 'resize: none;',
+                'placeholder': 'Enter comment...',
+                'rows': 5,
+                'cols': 40,
+            })
+        }
+        labels = {
+            'content': ''
         }
 
 PostImageFormSet = forms.inlineformset_factory(
