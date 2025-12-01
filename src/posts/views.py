@@ -1,9 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse
+from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Post, Reaction, PostImage, Comment
+from .models import User, UserProfile, Post, Reaction, PostImage, Comment
 from .forms import PostCreationForm, PostImageFormSet, CommentForm
-from users.models import UserProfile
+from users.weights import adjust_credibility, W_LIKE, W_ATTEND, W_POSTS
 
 @login_required
 def edit_post_view(request, id=None):
@@ -35,10 +37,29 @@ def edit_post_view(request, id=None):
             post.save()
             form.save_m2m()
 
-            formset = PostImageFormSet(request.POST, request.FILES, instance=post)
-            if formset.is_valid():
-                formset.save()
+        # Bind the POSTed image forms to the newly created post instance
+        formset = PostImageFormSet(request.POST, request.FILES, instance=post)
+        # Debug: print request.FILES and formset form info to server console
+        print('DEBUG: request.FILES keys:', list(request.FILES.keys()))
+        print('DEBUG: total_forms:', formset.total_form_count())
+        formset_forms = list(formset.forms)
+        for i, f in enumerate(formset_forms):
+            try:
+                changed = f.has_changed()
+            except Exception:
+                changed = 'err'
+            print(f'DEBUG: form {i} has_changed={changed} errors={f.errors if f.errors else None}')
 
+        if formset.is_valid():
+            # Let the formset save and attach images to `post`
+            saved_objs = formset.save()
+            print('DEBUG: saved objects count:', len(saved_objs))
+            # Apply post creation penalty to the author's credibility
+            try:
+                adjust_credibility(request.user, -W_POSTS)
+            except Exception:
+                # don't block post creation if this errors for some reason
+                pass
             return redirect('posts', id=post.id)
         else:
             if is_editing:
@@ -73,7 +94,6 @@ def edit_post_view(request, id=None):
 def post_view(request, id):
 
     """Loads Post information related to specified id"""
-    # --- Base queryset ---
     post = get_object_or_404(Post, id=id)
     post_author = post.user
     try:
@@ -81,7 +101,6 @@ def post_view(request, id):
     except UserProfile.DoesNotExist:
         profile = None
 
-    # like count and whether current user liked
     like_count = post.reactions.filter(sentiment='LIKE').count()
     user_liked = False
     if request.user.is_authenticated:
@@ -134,12 +153,19 @@ def post_view(request, id):
                 comment.delete()
             except Comment.DoesNotExist:
                 pass
+        elif 'attend_toggle' in request.POST:
+            reaction, _ = Reaction.objects.get_or_create(post=post, user=request.user)
+            reaction.is_attending = not reaction.is_attending
+            reaction.save()
+            if reaction.is_attending:
+                messages.success(request, 'Marked as attending.')
+            else:
+                messages.success(request, 'Removed attending status.')
             return redirect('posts', id=id)
 
     is_following = False
     if request.user.is_authenticated and request.user != post_author and profile:
         is_following = request.user.userprofile.is_following(profile)
-    # --- Context ---
     context = {
         'post': post,
         'author': post_author,
@@ -147,10 +173,10 @@ def post_view(request, id):
         'like_count': like_count,
         'user_liked': user_liked,
         'attending_count': attending_count,
-        'user_is_attending': user_is_attending,
         'is_following': is_following,
         'comments': comments,
         'comment_form': comment_form,
+        'is_attending': Reaction.objects.filter(post=post, user=request.user, is_attending=True).exists() if request.user.is_authenticated else False,
     }
 
     return render(request, 'posts/posts.html', context)
@@ -158,13 +184,45 @@ def post_view(request, id):
 
 @login_required
 def toggle_like_view(request, id):
-    """Toggle a LIKE reaction for the logged-in user on the given post.
 
-    - If the user has no Reaction for the post, create one with sentiment='LIKE'.
-    - If the user has a Reaction with sentiment='LIKE', clear the sentiment (unlike).
-    - If the user has a Reaction with a different sentiment, set it to 'LIKE'.
+    if request.method != 'POST':
+        return redirect('posts', id=id)
 
-    Redirects back to the post detail page.
+    post = get_object_or_404(Post, id=id)
+    reaction, created = Reaction.objects.get_or_create(post=post, user=request.user)
+
+    if created:
+        reaction.sentiment = 'LIKE'
+        reaction.save()
+        # increment author's credibility
+        try:
+            adjust_credibility(post.user, W_LIKE)
+        except Exception:
+            pass
+    else:
+        if reaction.sentiment == 'LIKE':
+            reaction.sentiment = None
+            try:
+                adjust_credibility(post.user, -W_LIKE)
+            except Exception:
+                pass
+        else:
+            reaction.sentiment = 'LIKE'
+            try:
+                adjust_credibility(post.user, W_LIKE)
+            except Exception:
+                pass
+        reaction.save()
+
+    return redirect('posts', id=id)
+
+
+@login_required
+def toggle_attend_view(request, id):
+    """Toggle the is_attending flag for the logged-in user on the given post.
+
+    Creates a Reaction if one doesn't exist and toggles the is_attending boolean.
+    Adjusts the post author's credibility accordingly.
     """
     if request.method != 'POST':
         return redirect('posts', id=id)
@@ -174,14 +232,25 @@ def toggle_like_view(request, id):
     reaction, created = Reaction.objects.get_or_create(post=post, user=request.user)
 
     if created:
-        reaction.sentiment = 'LIKE'
+        reaction.is_attending = True
         reaction.save()
+        try:
+            adjust_credibility(post.user, W_ATTEND)
+        except Exception:
+            pass
     else:
-        # toggle: if already LIKE -> remove sentiment; otherwise set to LIKE
-        if reaction.sentiment == 'LIKE':
-            reaction.sentiment = None
+        if reaction.is_attending:
+            reaction.is_attending = False
+            try:
+                adjust_credibility(post.user, -W_ATTEND)
+            except Exception:
+                pass
         else:
-            reaction.sentiment = 'LIKE'
+            reaction.is_attending = True
+            try:
+                adjust_credibility(post.user, W_ATTEND)
+            except Exception:
+                pass
         reaction.save()
 
     return redirect('posts', id=id)

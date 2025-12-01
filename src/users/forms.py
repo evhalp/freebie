@@ -5,6 +5,14 @@ from django.core.exceptions import ValidationError
 from .models import UserProfile
 
 class CustomUserCreationForm(UserCreationForm):
+    def clean_username(self):
+        username = self.cleaned_data.get("username")
+        if len(username) > 16 and username:
+                raise ValidationError(
+                    "Username cannot exceed 16 characters.",
+                    code='invalid_login',
+                )
+        return username
     class Meta(UserCreationForm.Meta):
         fields = UserCreationForm.Meta.fields + ("first_name", "last_name", "email",)
 
