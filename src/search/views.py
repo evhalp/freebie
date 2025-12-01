@@ -8,14 +8,16 @@ from posts.models import Post, Tag
 def search_view(request):
     """Search posts with text, tag, and sort filters (20 per page)."""
     q = (request.GET.get('q') or '').strip()                # text query
-    sort = (request.GET.get('sort') or 'popular').lower()   # 'popular' by default
+    # Default to 'for_you' which orders results by author credibility
+    sort = (request.GET.get('sort') or 'for_you').lower()
     tag = (request.GET.get('tag') or 'all').lower()         # tag filter ('all' by default)
     page_raw = request.GET.get('page', '1')
 
     # Build the base queryset. This is how chatgpt recommends
     qs = (
         Post.objects.all()
-        .select_related('user')
+        # include user and user profile so we can sort by credibility efficiently
+        .select_related('user', 'user__userprofile')
         .prefetch_related('tags')
         .annotate(
             like_count=Count(
@@ -43,10 +45,17 @@ def search_view(request):
     now = timezone.now()
 
     if sort == 'now':
-        qs = qs.filter(start_time__lte=now, end_time__gte=now).order_by('-like_count', '-created_at')
+        # happening now: show events happening now ordered by author credibility first
+        qs = qs.filter(start_time__lte=now, end_time__gte=now).order_by(
+            '-user__userprofile__credibility', '-like_count', '-created_at'
+        )
     elif sort == 'new':
         qs = qs.order_by('-created_at', '-like_count')
+    elif sort == 'for_you':
+        # For You: default ranking by author credibility, then popularity, then recency
+        qs = qs.order_by('-user__userprofile__credibility', '-like_count', '-created_at')
     else:
+        # fallback to popular
         qs = qs.order_by('-like_count', '-created_at')
 
     # 20 results per page
