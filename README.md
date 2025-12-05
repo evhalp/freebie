@@ -24,5 +24,6 @@ Django Commands:
 - python manage.py runserver = Runs Website
 - python manage.py createsuperuser = Creates Admin User
 - python manage.py migrate = Creates SQLite database (run if facing database issues)
+- python manage.py generate_posts = Generates 50 users and 100 posts (for testing). Requires images in media/post/images and media/user/images
 
 
